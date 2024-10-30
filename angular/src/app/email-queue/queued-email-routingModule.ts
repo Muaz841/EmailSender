@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { queuedEmailComponent as QueuedEmailComponent } from './email-queue.component';
+import { queuedEmailComponent as QueuedEmailComponent } from './queued-emailcomponent';
 
 
 const routes: Routes = [

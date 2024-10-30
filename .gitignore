@@ -10,3 +10,10 @@ aspnet-core/src/MAINABP.Migrator/Logs/Logs.txt
 aspnet-core/build/outputs/
 aspnet-core/docker/mvc/Mvc-Logs/
 
+
+/angular/src/app/app.component.spec.ts
+/angular/src/app/app.component.spec.ts
+/aspnet-core/src/EmailSender.Web.Host/App_Data/Logs/Logs.txt
+/aspnet-core/src/EmailSender.Web.Host/App_Data/Logs/Logs.txt.1
+/aspnet-core/src/EmailSender.Web.Host/App_Data/Logs/Logs.txt.2
+/aspnet-core/src/EmailSender.Web.Host/App_Data/Logs/Logs.txt.3

@@ -80,10 +80,12 @@ namespace EmailSender.EmailSender.QueueEmail
         protected IQueryable<EmailQueue> CreateFilteredQuery(QueuePagedDto input)
         {
             return Abp.Linq.Extensions.QueryableExtensions.WhereIf(
-                _queuedRepository.GetAll(),
-                !string.IsNullOrWhiteSpace(input.Keyword),
-                queue => queue.ToName.Contains(input.Keyword)
-            );
+                    _queuedRepository.GetAll(),
+                     !string.IsNullOrWhiteSpace(input.Keyword),
+                         queue => queue.To.Contains(input.Keyword)                              
+                              || queue.From.Contains(input.Keyword)
+                               || queue.Subject.Contains(input.Keyword)
+                        );
         }
 
         public async Task<QueuedEmailDto> GetQueueMailById(int emailId)

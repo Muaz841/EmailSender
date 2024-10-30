@@ -1,4 +1,5 @@
-﻿using Abp.Dependency;
+﻿using Abp.Configuration;
+using Abp.Dependency;
 using Abp.Net.Mail;
 using EmailSender.EmailSender.EmailTempalateManagers;
 using EmailSender.EmailSender.QueueEmail;
@@ -13,20 +14,22 @@ namespace EmailSender.EmailSender.EmailSender
 {
     public class EmailSenderManager : ITransientDependency, IEmailSenderManager
     {
-        private readonly IEmailTemplateManager templateManager;
-        private readonly IQueuedEmailManager queuedEmailManager;
+        private readonly IEmailTemplateManager _templateManager;
+        private readonly IQueuedEmailManager _queuedEmailManager;
         private readonly IConfiguration _configuration;
-        public EmailSenderManager(IEmailTemplateManager templateManager, IQueuedEmailManager queuedEmailManager, IConfiguration configuration)
+        private readonly ISettingManager _settingManager;
+        public EmailSenderManager(ISettingManager settingManager,IEmailTemplateManager templateManager, IQueuedEmailManager queuedEmailManager, IConfiguration configuration)
         {
             this._configuration = configuration;
-            this.templateManager = templateManager;
-            this.queuedEmailManager = queuedEmailManager;
+            this._templateManager = templateManager;
+            this._queuedEmailManager = queuedEmailManager;
+            this._settingManager = settingManager;
         }
 
         public  async Task<bool> SendEmailAsync( string username, string useremail, int tenantId)
         {
 
-                var emailtemplate = await templateManager.GetTemplateByIdAsync(tenantId);
+                var emailtemplate = await _templateManager.GetTemplateByIdAsync(tenantId);
 
             var tokenReplacements = new Dictionary<string, string>
         {
@@ -45,11 +48,11 @@ namespace EmailSender.EmailSender.EmailSender
                 Body = emailtemplate.Content,
                 TenantId = tenantId.ToString(),
                 Status = "pending",
-                From = _configuration["SmtpSettings:SenderEmail"],
-                FromName = _configuration["SmtpSettings:SenderName"],
+                From = await _settingManager.GetSettingValueForTenantAsync(EmailSettingNames.DefaultFromAddress, tenantId),
+                FromName = await _settingManager.GetSettingValueForTenantAsync(EmailSettingNames.DefaultFromDisplayName, tenantId),
             };
             // Add the email to the queue
-            await queuedEmailManager.AddQueueEmailAsync(emailQueue);
+            await _queuedEmailManager.AddQueueEmailAsync(emailQueue);
             return true;
         }
 
