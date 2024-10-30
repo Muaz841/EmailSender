@@ -1,0 +1,95 @@
+﻿using Abp.Application.Services.Dto;
+using Abp.Dependency;
+using Abp.Domain.Repositories;
+using Abp.Domain.Uow;
+using Abp.Linq.Extensions;
+using Abp.ObjectMapping;
+using EmailSender.EmailSender.EmailSenderEntities;
+using EmailSender.EmailSender.QueueEmail.QueueEmailDto;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace EmailSender.EmailSender.QueueEmail
+{
+    public class QueuedEmailManager : ITransientDependency, IQueuedEmailManager
+    {
+        private readonly IUnitOfWorkManager _unitOfWorkManager;
+        private readonly IRepository<EmailQueue, int> _queuedRepository;
+        private readonly IObjectMapper _objectMapper;
+
+        public QueuedEmailManager(IUnitOfWorkManager unitOfWorkManager, IRepository<EmailQueue, int> queuedRepository, IObjectMapper objectMapper)
+        {
+            _queuedRepository = queuedRepository;
+            _objectMapper = objectMapper;
+            _unitOfWorkManager = unitOfWorkManager;
+        }
+
+        public async Task<List<QueuedEmailDto>> GetPendingEmailsAsync()
+        {
+            var queued = await _queuedRepository.GetAllListAsync(q => q.Status != "Sent" && q.RetryCount < 5);
+            return _objectMapper.Map<List<QueuedEmailDto>>(queued);
+        }
+
+        public async Task IncrementRetryCountAsync(int emailId)
+        {
+            var email = await _queuedRepository.GetAsync(emailId);
+            email.RetryCount++;
+
+            using (var unitOfWork = _unitOfWorkManager.Begin(System.Transactions.TransactionScopeOption.RequiresNew))
+            {
+                await _queuedRepository.UpdateAsync(email);
+                await unitOfWork.CompleteAsync();
+            }
+        }
+
+        public async Task AddQueueEmailAsync(QueuedEmailDto email)
+        {
+            var entry = _objectMapper.Map<EmailQueue>(email);
+            await _queuedRepository.InsertAsync(entry);
+        }
+
+        public async Task UpdateEmailStatusAsync(int emailId, string status)
+        {
+            var email = await _queuedRepository.GetAsync(emailId);
+            email.Status = status;
+
+            using (var unitOfWork = _unitOfWorkManager.Begin(System.Transactions.TransactionScopeOption.RequiresNew))
+            {
+                await _queuedRepository.UpdateAsync(email);
+                await unitOfWork.CompleteAsync();
+            }
+        }
+        public async Task<PagedResultDto<QueuedEmailDto>> GetAllEmailsInQueueAsync(QueuePagedDto input)
+        {
+            var query = CreateFilteredQuery(input);
+            var totalCount = await query.CountAsync();
+
+            // Apply sorting and pagination
+            var pagedEmails = await query
+                .OrderBy(p => p.Id)
+                .PageBy(input)
+                .AsNoTracking()
+                .ToListAsync();
+
+            var queuedDto = _objectMapper.Map<List<QueuedEmailDto>>(pagedEmails);
+            return new PagedResultDto<QueuedEmailDto>(totalCount, queuedDto);
+        }
+
+        protected IQueryable<EmailQueue> CreateFilteredQuery(QueuePagedDto input)
+        {
+            return Abp.Linq.Extensions.QueryableExtensions.WhereIf(
+                _queuedRepository.GetAll(),
+                !string.IsNullOrWhiteSpace(input.Keyword),
+                queue => queue.ToName.Contains(input.Keyword)
+            );
+        }
+
+        public async Task<QueuedEmailDto> GetQueueMailById(int emailId)
+        {
+            var email = await _queuedRepository.GetAsync(emailId);
+            return _objectMapper.Map<QueuedEmailDto>(email);
+        }
+    }
+}
