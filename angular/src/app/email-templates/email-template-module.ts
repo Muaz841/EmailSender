@@ -1,9 +1,11 @@
 import { NgModule } from '@angular/core';
-import { template } from 'lodash-es';
+import {EmailTemplatesComponent}from './email-templates.component'
+import {emailTemplateRoutingModule} from './email-template-routingmodule'
+import { SharedModule } from '@shared/shared.module';
 
 
 @NgModule({
-    declarations: [],
-    imports: [],
+    declarations: [EmailTemplatesComponent],
+    imports: [emailTemplateRoutingModule,SharedModule],
 })
 export class emailtemplatemodule {}

@@ -122,7 +122,7 @@
 		<text name="403PageButton">Go back to Dashboard</text>
 		<text name="Email">Emails</text>
 		<text name="Template">Email Templates</text>
-		<text name="Queue">Emails In Queue</text>
+		<text name="Queued">Emails In Queue</text>
 		<text name="QueueDetails">Queued Email Details</text>
 	</texts>
 </localizationDictionary>

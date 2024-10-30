@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import {EmailTemplatesComponent} from './email-templates.component'
+import { queuedEmailComponent as QueuedEmailComponent } from './email-queue.component';
 
 
 const routes: Routes = [
     {
         path: '',
-        component: EmailTemplatesComponent,
+        component: QueuedEmailComponent,
         pathMatch: 'full',
     },
 ];
@@ -15,4 +15,4 @@ const routes: Routes = [
     imports: [RouterModule.forChild(routes)],
     exports: [RouterModule],
 })
-export class emailTemplateRoutingModule {}
+export class queuedEmailRoutingModule {}
