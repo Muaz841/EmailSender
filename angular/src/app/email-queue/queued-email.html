@@ -63,21 +63,23 @@
   </section>
 </div>
 
-<p-dialog header="Email Details" [modal]="true" [(visible)]="visible" [style]="{ width: '70rem',height: '40rem' }"
-  [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [dismissableMask]="true">
+<p-dialog header="Email Details" [modal]="true" [(visible)]="visible" 
+          [style]="{ width: '70rem', height: '40rem' }"
+          [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" 
+          [dismissableMask]="true">
 
   <div *ngIf="selectedEmail">
     <div style="display: flex; flex-direction: column; gap: 10px;">
       <!-- Row 1 with 6-6 column structure -->
       <div style="display: flex; gap: 10px;">
         <div style="flex: 1;"> <!-- First 6-column div -->
-          <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; flex-direction: column; ">
             <span><strong>From:</strong></span>
             <span>{{ selectedEmail.from }}</span>
           </div>
         </div>
         <div style="flex: 1;"> <!-- Second 6-column div -->
-          <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; flex-direction: column; ">
             <span><strong>To:</strong></span>
             <span>{{ selectedEmail.to }}</span>
           </div>
@@ -87,41 +89,35 @@
       <!-- Row 2 with 6-6 structure -->
       <div style="display: flex; gap: 10px;">
         <div style="flex: 1;"> <!-- First 6-column div -->
-          <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; flex-direction: column; ">
             <span><strong>To Name:</strong></span>
             <span>{{ selectedEmail.toName }}</span>
           </div>
         </div>
         <div style="flex: 1;"> <!-- Second 6-column div -->
-          <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; flex-direction: column; ">
             <span><strong>Subject:</strong></span>
             <span>{{ selectedEmail.subject }}</span>
           </div>
         </div>
       </div>
-    
+
       <!-- Status Row - Full Width -->
-      <div style="display: flex; gap: 10px;">
-        <div style="flex: 1;">
-          <p-tag [value]="selectedEmail.status"
-                 [severity]="selectedEmail.status === 'sent' ? 'success' : 'danger'">
-          </p-tag>
+      <div style="display: flex; flex-direction: column; gap: 5px;">
+        <span><strong>Status:</strong></span>
+        <p-tag [value]="selectedEmail.status"
+               [severity]="selectedEmail.status === 'sent' ? 'success' : 'danger'">
+        </p-tag>
+      </div>
+
+      <div style="margin-top: 2px;  ">
+        <span><strong>Body:</strong></span>
+        <div class="card" style="height: 300px; overflow-y: auto; margin-top: 10px;">
+          <p-fieldset>
+            <p [innerHtml]="selectedEmail.body" style="margin: 0;"></p>
+          </p-fieldset>
         </div>
       </div>
     </div>
-
-    
-
-    
-    <div style="display: flex; gap: 10px;">
-      <span><strong>Body:</strong></span>
-      <div class="card" style="height: 400px;  overflow-y: auto;">
-        <p-fieldset>
-          <p [innerHtml]="selectedEmail.body" style="margin: 0;"></p>
-        </p-fieldset>
-      </div>
-    </div>
-
-
   </div>
 </p-dialog>
