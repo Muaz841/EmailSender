@@ -17,3 +17,7 @@ aspnet-core/docker/mvc/Mvc-Logs/
 /aspnet-core/src/EmailSender.Web.Host/App_Data/Logs/Logs.txt.1
 /aspnet-core/src/EmailSender.Web.Host/App_Data/Logs/Logs.txt.2
 /aspnet-core/src/EmailSender.Web.Host/App_Data/Logs/Logs.txt.3
+/aspnet-core/src/EmailSender.Web.Host/App_Data/Logs/Logs.txt
+/aspnet-core/src/EmailSender.Web.Host/App_Data/Logs/Logs.txt.1
+/aspnet-core/src/EmailSender.Web.Host/App_Data/Logs/Logs.txt.2
+/aspnet-core/src/EmailSender.Web.Host/App_Data/Logs/Logs.txt.4
