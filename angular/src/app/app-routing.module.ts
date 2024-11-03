@@ -50,7 +50,7 @@ import { AppComponent } from './app.component';
                     },
                     {
                         path: 'queued-email',
-                        loadChildren: () => import('./email-queue/queued-email-module').then((m) => m.queuedEmailModule),
+                        loadChildren: () => import('./queued-emails/queued-email-module').then((m) => m.queuedEmailModule),
                         canActivate: [AppRouteGuard]
                     },
                 ]

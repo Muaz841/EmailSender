@@ -84,10 +84,9 @@ namespace EmailSender.EmailSender.QueueEmail
                      !string.IsNullOrWhiteSpace(input.Keyword),
                          queue => queue.To.Contains(input.Keyword)                              
                               || queue.From.Contains(input.Keyword)
-                               || queue.Subject.Contains(input.Keyword)
+                               || queue.Subject.Contains(input.Keyword)                               
                         );
         }
-
         public async Task<QueuedEmailDto> GetQueueMailById(int emailId)
         {
             var email = await _queuedRepository.GetAsync(emailId);

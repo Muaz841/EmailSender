@@ -1,9 +1,8 @@
-﻿using EmailSender.EmailSender.EmailTempalateManagers;
+﻿using Abp.Application.Services.Dto;
+using Abp.Runtime.Session;
+using EmailSender.EmailSender.EmailTempalateManagers;
 using EmailSender.EmailSender.EmailTempalateManagers.EmailDto;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace EmailSender.EmailServices.EmailTemplates
@@ -11,27 +10,33 @@ namespace EmailSender.EmailServices.EmailTemplates
     public class TemplateEmailService : EmailSenderAppServiceBase, ITemplateEmailService
     {
         private readonly IEmailTemplateManager _emailtemplate;
-        public TemplateEmailService(IEmailTemplateManager emailtemplate)
+        private readonly IAbpSession _abpSession;
+        public TemplateEmailService(IEmailTemplateManager emailtemplate, IAbpSession abpsession)
         {
             _emailtemplate = emailtemplate;
+            _abpSession = abpsession;
         }
 
         //show Template
-        public async Task<List<EmailTemplateDto>> GetTemplate()
+        public async Task<PagedResultDto<EmailTemplateDto>> GetTemplate(EmailTemplatepagedDto input)
         {
-            return await _emailtemplate.GetAllTemplatesAsync();
-
+            return await _emailtemplate.GetAllTemplatesAsync(input);
         }
 
-        public Task CreateTemplate(EmailTemplateDto templateDto)
+        public async Task CreateOrEditTemplate(EmailTemplateDto templateDto)
         {
-            return _emailtemplate.CreateTemplateAsync(templateDto);
+            templateDto.TenantId = _abpSession.TenantId ?? 1;
+            templateDto.TenantId = _abpSession.TenantId ?? 1;
+            await(templateDto.Id <= 0
+                ? _emailtemplate.CreateTemplateAsync(templateDto)
+                : _emailtemplate.UpdateTemplateAsync(templateDto));
         }
 
         public Task DeleteTemplate(int id)
         {
             return _emailtemplate.DeleteTemplateAsync(id);
-        }
 
+        }
+       
     }
 }

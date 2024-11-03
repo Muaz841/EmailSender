@@ -1,4 +1,5 @@
-﻿using EmailSender.EmailSender.EmailSenderEntities;
+﻿using Abp.Application.Services.Dto;
+using EmailSender.EmailSender.EmailSenderEntities;
 using EmailSender.EmailSender.EmailTempalateManagers.EmailDto;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ namespace EmailSender.EmailSender.EmailTempalateManagers
     {
         Task<EmailTemplateDto> CreateTemplateAsync(EmailTemplateDto template);
         Task<EmailTemplateDto> GetTemplateByIdAsync(int id);
-        Task<List<EmailTemplateDto>> GetAllTemplatesAsync();
+        Task<PagedResultDto<EmailTemplateDto>> GetAllTemplatesAsync(EmailTemplatepagedDto input);
         Task UpdateTemplateAsync(EmailTemplateDto updatetemplate);
         Task DeleteTemplateAsync(int id);
     }

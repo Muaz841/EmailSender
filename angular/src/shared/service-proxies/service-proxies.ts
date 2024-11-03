@@ -1005,10 +1005,35 @@ export class TemplateEmailServiceServiceProxy {
     }
 
     /**
+     * @param keyword (optional) 
+     * @param status (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
      * @return OK
      */
-    getTemplate(): Observable<EmailTemplateDto[]> {
-        let url_ = this.baseUrl + "/api/services/app/TemplateEmailService/GetTemplate";
+    getTemplate(keyword: string | undefined, status: string | undefined, sorting: string | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<EmailTemplateDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/TemplateEmailService/GetTemplate?";
+        if (keyword === null)
+            throw new Error("The parameter 'keyword' cannot be null.");
+        else if (keyword !== undefined)
+            url_ += "Keyword=" + encodeURIComponent("" + keyword) + "&";
+        if (status === null)
+            throw new Error("The parameter 'status' cannot be null.");
+        else if (status !== undefined)
+            url_ += "status=" + encodeURIComponent("" + status) + "&";
+        if (sorting === null)
+            throw new Error("The parameter 'sorting' cannot be null.");
+        else if (sorting !== undefined)
+            url_ += "sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -1026,14 +1051,14 @@ export class TemplateEmailServiceServiceProxy {
                 try {
                     return this.processGetTemplate(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<EmailTemplateDto[]>;
+                    return _observableThrow(e) as any as Observable<EmailTemplateDtoPagedResultDto>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<EmailTemplateDto[]>;
+                return _observableThrow(response_) as any as Observable<EmailTemplateDtoPagedResultDto>;
         }));
     }
 
-    protected processGetTemplate(response: HttpResponseBase): Observable<EmailTemplateDto[]> {
+    protected processGetTemplate(response: HttpResponseBase): Observable<EmailTemplateDtoPagedResultDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1044,14 +1069,7 @@ export class TemplateEmailServiceServiceProxy {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            if (Array.isArray(resultData200)) {
-                result200 = [] as any;
-                for (let item of resultData200)
-                    result200.push(EmailTemplateDto.fromJS(item));
-            }
-            else {
-                result200 = <any>null;
-            }
+            result200 = EmailTemplateDtoPagedResultDto.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -1066,8 +1084,8 @@ export class TemplateEmailServiceServiceProxy {
      * @param body (optional) 
      * @return OK
      */
-    createTemplate(body: EmailTemplateDto | undefined): Observable<void> {
-        let url_ = this.baseUrl + "/api/services/app/TemplateEmailService/CreateTemplate";
+    createOrEditTemplate(body: EmailTemplateDto | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/TemplateEmailService/CreateOrEditTemplate";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
@@ -1082,11 +1100,11 @@ export class TemplateEmailServiceServiceProxy {
         };
 
         return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processCreateTemplate(response_);
+            return this.processCreateOrEditTemplate(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processCreateTemplate(response_ as any);
+                    return this.processCreateOrEditTemplate(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<void>;
                 }
@@ -1095,7 +1113,7 @@ export class TemplateEmailServiceServiceProxy {
         }));
     }
 
-    protected processCreateTemplate(response: HttpResponseBase): Observable<void> {
+    protected processCreateOrEditTemplate(response: HttpResponseBase): Observable<void> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -2738,6 +2756,61 @@ export interface IEmailTemplateDto {
     isActive: boolean | undefined;
     token: string | undefined;
     cc: string | undefined;
+}
+
+export class EmailTemplateDtoPagedResultDto implements IEmailTemplateDtoPagedResultDto {
+    items: EmailTemplateDto[] | undefined;
+    totalCount: number;
+
+    constructor(data?: IEmailTemplateDtoPagedResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items.push(EmailTemplateDto.fromJS(item));
+            }
+            this.totalCount = _data["totalCount"];
+        }
+    }
+
+    static fromJS(data: any): EmailTemplateDtoPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new EmailTemplateDtoPagedResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["totalCount"] = this.totalCount;
+        return data;
+    }
+
+    clone(): EmailTemplateDtoPagedResultDto {
+        const json = this.toJSON();
+        let result = new EmailTemplateDtoPagedResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IEmailTemplateDtoPagedResultDto {
+    items: EmailTemplateDto[] | undefined;
+    totalCount: number;
 }
 
 export class FlatPermissionDto implements IFlatPermissionDto {

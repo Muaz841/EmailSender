@@ -1,4 +1,5 @@
-﻿using EmailSender.EmailSender.EmailTempalateManagers.EmailDto;
+﻿using Abp.Application.Services.Dto;
+using EmailSender.EmailSender.EmailTempalateManagers.EmailDto;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -7,9 +8,9 @@ namespace EmailSender.EmailServices.EmailTemplates
     public interface ITemplateEmailService
     {
 
-        Task<List<EmailTemplateDto>> GetTemplate();
+        Task<PagedResultDto<EmailTemplateDto>> GetTemplate(EmailTemplatepagedDto input);
 
-        Task CreateTemplate(EmailTemplateDto templateDto);
+        Task CreateOrEditTemplate(EmailTemplateDto templateDto);
 
         Task DeleteTemplate(int id);
     }
