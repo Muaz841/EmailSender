@@ -1,7 +1,7 @@
 <div class="container-fluid " style="padding: 1.5rem;">
   SMTP host
   <input type="text" [(ngModel)]="smtpSettingsList.host" class="col-md-12 form-control" />
-<br>
+  <br>
   Sender Email
   <input type="text" [(ngModel)]="smtpSettingsList.senderEmail" class="col-md-12 form-control" />
   <br>
@@ -20,8 +20,16 @@
   Password
   <input type="text" [(ngModel)]="smtpSettingsList.password" class="col-md-12 form-control" />
   <br>
-  <div class="saveBtn" style = "display: flex; justify-content: flex-end;" >
-    <button (click)="saveChanges(smtpSettingsList)" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+
+  <input type="text" [(ngModel)]="to" />
+  <button (click)="testMail(to)" class="mx-1">
+    <i class="fa-solid fa-envelope-circle-check">
+    </i></button>
+
+  <br>
+  <div class="saveBtn" style="display: flex; justify-content: flex-end;">
+    <button (click)="saveChanges(smtpSettingsList)"
+      style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
       Save
     </button>
   </div>

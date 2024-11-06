@@ -72,6 +72,7 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
                     this.l('All Template'),
                     '/app/host-Template',
                     'fas fa-message',
+                    'Pages.Tenants',
                     
                 ),
                 new MenuItem(
