@@ -10,7 +10,7 @@ namespace EmailSender.EmailSender.QueueEmail.QueueEmailDto
 {
     public class QueuedEmailDto : Entity<int>
     {
-        public string? TenantId { get; set; }
+        public int? TenantId { get; set; }
         public string? EmailPriority { get; set; }
         public string From { get; set; }
         public string? FromName { get; set; }

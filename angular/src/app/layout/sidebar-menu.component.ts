@@ -69,12 +69,21 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
                     
                 ),
                 new MenuItem(
-                    this.l('Queued'),
-                    '/app/queued-email',
+                    this.l('All Template'),
+                    '/app/host-Template',
                     'fas fa-message',
                     
                 ),
-              
+                new MenuItem(
+                    this.l('Queued'),
+                    '/app/queued-email',
+                    'fas fa-message',                    
+                ),
+                new MenuItem(
+                    this.l('SMTPSETTINGS'),
+                    '/app/smtpSettings',
+                    'fas fa-cog',                    
+                ),
             ])
         ];
     }

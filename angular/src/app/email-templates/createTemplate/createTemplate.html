@@ -1,6 +1,6 @@
 <p-dialog header="Create Email Template" [modal]="true" [(visible)]="visible"
     [style]="{ width: '70rem', height: '90rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }"
-    [dismissableMask]="true">
+    [dismissableMask]="true"  (onHide)="closeDialog()">
 
     <div style="height: auto;width: auto;">
         <div class="card-body">
@@ -42,14 +42,13 @@
                 </p-tabPanel>
 
                 <p-tabPanel header="Tokens">
-                    <div *ngIf="tokenList.length > 0; else noTokens">
-                        <ul>
-                            <li *ngFor="let token of tokenList">{{ token }}</li>
-                        </ul>
-                    </div>
-                    <ng-template #noTokens>
-                        <p>No tokens available.</p>
-                    </ng-template>
+                    <div >
+                        <ng-container *ngFor="let token of tokenList">
+                            <input type="text" [value]="token" readonly />
+                            <br>
+                        
+                        </ng-container>
+                    </div>                                
                 </p-tabPanel>
             </p-tabView>
         </div>

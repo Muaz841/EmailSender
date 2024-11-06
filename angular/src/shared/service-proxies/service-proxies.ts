@@ -885,15 +885,10 @@ export class SmtpSettingsServiceServiceProxy {
     }
 
     /**
-     * @param tenantid (optional) 
      * @return OK
      */
-    getSmtpSettings(tenantid: number | undefined): Observable<SmtpSettingsDto> {
-        let url_ = this.baseUrl + "/api/services/app/SmtpSettingsService/GetSmtpSettings?";
-        if (tenantid === null)
-            throw new Error("The parameter 'tenantid' cannot be null.");
-        else if (tenantid !== undefined)
-            url_ += "tenantid=" + encodeURIComponent("" + tenantid) + "&";
+    getSmtpSettings(): Observable<SmtpSettingsDto> {
+        let url_ = this.baseUrl + "/api/services/app/SmtpSettingsService/GetSmtpSettings";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -944,8 +939,60 @@ export class SmtpSettingsServiceServiceProxy {
      * @param body (optional) 
      * @return OK
      */
-    updateSmtpSettings(body: SmtpSettingsDto | undefined): Observable<void> {
-        let url_ = this.baseUrl + "/api/services/app/SmtpSettingsService/UpdateSmtpSettings";
+    createSmtpSettings(body: SmtpSettingsDto | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/SmtpSettingsService/CreateSmtpSettings";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateSmtpSettings(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateSmtpSettings(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processCreateSmtpSettings(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    updateTenantSmtpSettings(body: SmtpSettingsDto | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/SmtpSettingsService/UpdateTenantSmtpSettings";
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(body);
@@ -960,11 +1007,11 @@ export class SmtpSettingsServiceServiceProxy {
         };
 
         return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processUpdateSmtpSettings(response_);
+            return this.processUpdateTenantSmtpSettings(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processUpdateSmtpSettings(response_ as any);
+                    return this.processUpdateTenantSmtpSettings(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<void>;
                 }
@@ -973,7 +1020,59 @@ export class SmtpSettingsServiceServiceProxy {
         }));
     }
 
-    protected processUpdateSmtpSettings(response: HttpResponseBase): Observable<void> {
+    protected processUpdateTenantSmtpSettings(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param tO (optional) 
+     * @return OK
+     */
+    testMail(tO: string | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/SmtpSettingsService/TestMail?";
+        if (tO === null)
+            throw new Error("The parameter 'tO' cannot be null.");
+        else if (tO !== undefined)
+            url_ += "TO=" + encodeURIComponent("" + tO) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processTestMail(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processTestMail(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processTestMail(response: HttpResponseBase): Observable<void> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1059,6 +1158,82 @@ export class TemplateEmailServiceServiceProxy {
     }
 
     protected processGetTemplate(response: HttpResponseBase): Observable<EmailTemplateDtoPagedResultDto> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = EmailTemplateDtoPagedResultDto.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param keyword (optional) 
+     * @param status (optional) 
+     * @param sorting (optional) 
+     * @param skipCount (optional) 
+     * @param maxResultCount (optional) 
+     * @return OK
+     */
+    hostGetTemplate(keyword: string | undefined, status: string | undefined, sorting: string | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<EmailTemplateDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/TemplateEmailService/HostGetTemplate?";
+        if (keyword === null)
+            throw new Error("The parameter 'keyword' cannot be null.");
+        else if (keyword !== undefined)
+            url_ += "Keyword=" + encodeURIComponent("" + keyword) + "&";
+        if (status === null)
+            throw new Error("The parameter 'status' cannot be null.");
+        else if (status !== undefined)
+            url_ += "status=" + encodeURIComponent("" + status) + "&";
+        if (sorting === null)
+            throw new Error("The parameter 'sorting' cannot be null.");
+        else if (sorting !== undefined)
+            url_ += "sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount === null)
+            throw new Error("The parameter 'skipCount' cannot be null.");
+        else if (skipCount !== undefined)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount === null)
+            throw new Error("The parameter 'maxResultCount' cannot be null.");
+        else if (maxResultCount !== undefined)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processHostGetTemplate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processHostGetTemplate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<EmailTemplateDtoPagedResultDto>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<EmailTemplateDtoPagedResultDto>;
+        }));
+    }
+
+    protected processHostGetTemplate(response: HttpResponseBase): Observable<EmailTemplateDtoPagedResultDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1295,6 +1470,64 @@ export class TenantServiceProxy {
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getAllTenants(): Observable<TenantDto[]> {
+        let url_ = this.baseUrl + "/api/services/app/Tenant/GetAllTenants";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "text/plain"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllTenants(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllTenants(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<TenantDto[]>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<TenantDto[]>;
+        }));
+    }
+
+    protected processGetAllTenants(response: HttpResponseBase): Observable<TenantDto[]> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            if (Array.isArray(resultData200)) {
+                result200 = [] as any;
+                for (let item of resultData200)
+                    result200.push(TenantDto.fromJS(item));
+            }
+            else {
+                result200 = <any>null;
+            }
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -3223,7 +3456,7 @@ export interface IPermissionDtoListResultDto {
 
 export class QueuedEmailDto implements IQueuedEmailDto {
     id: number;
-    tenantId: string | undefined;
+    tenantId: number | undefined;
     emailPriority: string | undefined;
     from: string | undefined;
     fromName: string | undefined;
@@ -3304,7 +3537,7 @@ export class QueuedEmailDto implements IQueuedEmailDto {
 
 export interface IQueuedEmailDto {
     id: number;
-    tenantId: string | undefined;
+    tenantId: number | undefined;
     emailPriority: string | undefined;
     from: string | undefined;
     fromName: string | undefined;

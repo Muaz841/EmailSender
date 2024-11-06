@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { EmailTemplatesComponent } from './email-templates.component';
 import { TemplateEmailServiceServiceProxy } from '@shared/service-proxies/service-proxies';
+import { HostEmailTemplatesComponent } from './host-template-component';
 
 
 
@@ -10,6 +11,11 @@ const routes: Routes = [
     {
         path: '',
         component: EmailTemplatesComponent,
+        pathMatch: 'full',
+    },
+    {
+        path: 'host-Template',
+        component: HostEmailTemplatesComponent,
         pathMatch: 'full',
     },
 ];

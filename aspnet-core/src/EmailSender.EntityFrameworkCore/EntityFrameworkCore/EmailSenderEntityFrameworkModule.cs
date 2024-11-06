@@ -1,6 +1,7 @@
 ﻿using Abp.EntityFrameworkCore.Configuration;
 using Abp.Modules;
 using Abp.Reflection.Extensions;
+using Abp.Runtime.Session;
 using Abp.Zero.EntityFrameworkCore;
 using EmailSender.EntityFrameworkCore.Seed;
 
@@ -13,6 +14,7 @@ namespace EmailSender.EntityFrameworkCore
     {
         /* Used it tests to skip dbcontext registration, in order to use in-memory database of EF Core */
         public bool SkipDbContextRegistration { get; set; }
+        private readonly IAbpSession _abpSession;
 
         public bool SkipDbSeed { get; set; }
 

@@ -1,0 +1,29 @@
+<div class="container-fluid " style="padding: 1.5rem;">
+  SMTP host
+  <input type="text" [(ngModel)]="smtpSettingsList.host" class="col-md-12 form-control" />
+<br>
+  Sender Email
+  <input type="text" [(ngModel)]="smtpSettingsList.senderEmail" class="col-md-12 form-control" />
+  <br>
+  PORT
+  <input type="text" [(ngModel)]="smtpSettingsList.port" class="col-md-12 form-control" />
+  <br>
+  Use SSL
+  <input type="text" [(ngModel)]="smtpSettingsList.enableSsl" class="col-md-12 form-control" />
+  <br>
+  Domain name
+  <input type="text" [(ngModel)]="smtpSettingsList.domain" class="col-md-12 form-control" />
+  <br>
+  Username
+  <input type="text" [(ngModel)]="smtpSettingsList.userName" class="col-md-12 form-control" />
+  <br>
+  Password
+  <input type="text" [(ngModel)]="smtpSettingsList.password" class="col-md-12 form-control" />
+  <br>
+  <div class="saveBtn" style = "display: flex; justify-content: flex-end;" >
+    <button (click)="saveChanges(smtpSettingsList)" style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+      Save
+    </button>
+  </div>
+
+</div>

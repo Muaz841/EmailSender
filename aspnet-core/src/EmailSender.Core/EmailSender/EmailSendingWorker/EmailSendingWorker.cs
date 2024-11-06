@@ -1,7 +1,6 @@
 ﻿using Abp.Dependency;
 using Abp.Threading.BackgroundWorkers;
 using System;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using EmailSender.EmailSender.QueueEmail;
@@ -10,93 +9,92 @@ using System.Net;
 using Abp.Threading.Timers;
 using Abp.Domain.Uow;
 using Abp.Configuration;
-using Abp.Runtime.Session;
-using Abp.MultiTenancy;
 using Abp.Net.Mail;
+using EmailSender.MultiTenancy;
+using Abp.Domain.Repositories;
+using static EmailSender.Authorization.Roles.StaticRoleNames;
+using static EmailSender.EmailSender.EmailSenderManager.SmtpDto.SmtpSettingsMethod;
 
 
 namespace EmailSender.EmailSender.EmailWorker
 {
-
     public class EmailSendingWorker : PeriodicBackgroundWorkerBase, ISingletonDependency
-    {        
+    {
+        
         private readonly IQueuedEmailManager _emailQueueRepository;
         private readonly IEmailSenderManager _emailSenderManager;
-        private readonly IConfiguration _configuration;
         private readonly ILogger<EmailSendingWorker> logger;
         private readonly IUnitOfWorkManager _unitOfWorkManager;
         private readonly ISettingManager _settingManager;
-        private readonly IAbpSession _abpSession;        
+        private readonly IRepository<Tenant, int> _tenantRepository;
 
         public EmailSendingWorker(
-            IAbpSession AbpSession,
+
             IUnitOfWorkManager unitOfWorkManager,
-            AbpTimer timer,
+              AbpTimer timer,
                  IQueuedEmailManager emailQueueRepository,
                  IEmailSenderManager emailSenderManager,
                  IConfiguration configuration,
                  ISettingManager settingManager,
-        ILogger<EmailSendingWorker> logger) : base(timer)
+                 ILogger<EmailSendingWorker> logger,
+                  IRepository<Tenant, int> tenantRepository) : base(timer)
         {
-            _abpSession = AbpSession;
+
             _settingManager = settingManager;
-            _emailQueueRepository = emailQueueRepository;
-            _configuration = configuration;
+            _emailQueueRepository = emailQueueRepository;           
             _emailSenderManager = emailSenderManager;
             logger = this.logger;
-            Timer.Period = (20 * 1000); 
+            Timer.Period = (10 * 1000);
             _unitOfWorkManager = unitOfWorkManager;
+            _tenantRepository = tenantRepository;
         }
-        protected override async void DoWork()
+        protected override async void DoWork()  
         {
-            int? tenantid = _abpSession.TenantId;
-            var Id = tenantid.HasValue && tenantid.Value != 0 ? tenantid.Value : MultiTenancyConsts.DefaultTenantId;
-
             using (var unitOfWork = _unitOfWorkManager.Begin())
             {
-                var emails = await _emailQueueRepository.GetPendingEmailsAsync();
-                if (emails == null) {return;}
-
-                foreach (var email in emails)
+                var allTenant = await _tenantRepository.GetAllAsync();
+                foreach (var tenant in allTenant)
                 {
-                    try
+                    int TenantId = tenant.Id;
+                    //Fetching-SMTP SETTINGS
+                    var smtpSettings = await SmtpSettingsHelper.GetSmtpSettingsAsync(_settingManager, TenantId);
+
+                    var emails = await _emailQueueRepository.GetPendingEmailsTWAsync(TenantId);
+                    if (emails == null) { return; }
+
+                    foreach (var email in emails)
                     {
-                        //Fetching-data
-                        var smtpHost = await _settingManager.GetSettingValueForTenantAsync(EmailSettingNames.Smtp.Host, Id);
-                        var smtpPort = int.Parse(await _settingManager.GetSettingValueForTenantAsync(EmailSettingNames.Smtp.Port, Id));
-                        var smtpUserName = await _settingManager.GetSettingValueForTenantAsync(EmailSettingNames.Smtp.UserName, Id);
-                        var smtpPassword = await _settingManager.GetSettingValueForTenantAsync(EmailSettingNames.Smtp.Password, Id);
-                        var smtpSenderEmail = await _settingManager.GetSettingValueForTenantAsync(EmailSettingNames.DefaultFromAddress, Id);
-                        var smtpEnableSsl = await _settingManager.GetSettingValueForTenantAsync<bool>(EmailSettingNames.Smtp.EnableSsl, Id);
-
-                        using (var client = new SmtpClient(smtpHost, smtpPort)
+                        try
                         {
-                            Credentials = new NetworkCredential(smtpUserName, smtpPassword),
-                            EnableSsl = smtpEnableSsl 
-                        })                     
-                        {
-                            // Prepare the MailMessage
-                            var mailMessage = new MailMessage
+                            using (var client = new SmtpClient(smtpSettings.Host, Int32.Parse(smtpSettings.Port))
                             {
-                                From = new MailAddress(smtpSenderEmail),
-                                Subject = email.Subject,
-                                Body = email.Body, 
-                                IsBodyHtml = true 
-                            };
-                            mailMessage.To.Add(email.To); 
+                                Credentials = new NetworkCredential(smtpSettings.UserName, smtpSettings.Password),
+                                EnableSsl = smtpSettings.EnableSsl
+                            })
+                            {
+                                // Prepare the MailMessage
+                                var mailMessage = new MailMessage
+                                {
+                                    From = new MailAddress(smtpSettings.SenderEmail),
+                                    Subject = email.Subject,
+                                    Body = email.Body,
+                                    IsBodyHtml = true
+                                };
+                                mailMessage.To.Add(email.To);
 
-                            // Send the email
-                            await client.SendMailAsync(mailMessage);
-                            await _emailQueueRepository.UpdateEmailStatusAsync(email.Id, "sent");
+                                // Send the email
+                                await client.SendMailAsync(mailMessage);
+                                await _emailQueueRepository.UpdateEmailStatusAsync(email.Id, "sent");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            await unitOfWork.CompleteAsync();
+                            _emailQueueRepository.IncrementRetryCountAsync(email.Id);
                         }
                     }
-                    catch (Exception ex)
-                    {
-                        await unitOfWork.CompleteAsync();
-                        _emailQueueRepository.IncrementRetryCountAsync(email.Id);
-                    }
-                }
 
+                }
             }
 
         }

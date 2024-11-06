@@ -24,12 +24,15 @@ export class CreateTemplatesComponent extends AppComponentBase implements OnInit
   @Output() onSave = new EventEmitter<void>();
   createEmail: EmailTemplateDto = new EmailTemplateDto();
   visible: boolean = false;
-  tokenList: string[] = [];
+
+  tokenList: string[] = ["{{username}}", "{{useremail}}"];
 
   constructor(
     injector: Injector,
     private _emailService: TemplateEmailServiceServiceProxy,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private modalRef: BsModalRef // Inject BsModalRef here
+
   ) {
     super(injector);
   }
@@ -39,13 +42,19 @@ export class CreateTemplatesComponent extends AppComponentBase implements OnInit
   }
 
   saveChanges() {
-    this._emailService.createOrEditTemplate(this.createEmail).subscribe({
+    this.createEmail.token = this.tokenList.join(',');
+    this._emailService.createOrEditTemplate(this.createEmail).pipe(
+      finalize(() => {
+        this.onSave.emit(); // Emit the event after saving
+      })
+    ).subscribe({
       next: (response) => {        
-      },      
+        this.closeDialog();
+      }
     });
-    this.closeDialog();
   }
   closeDialog() {
     this.visible = false;
+    this.modalRef.hide(); // Hide the modal, ensuring overlay disappears
   }
 }

@@ -2,7 +2,6 @@
 using Abp.Dependency;
 using Abp.Domain.Repositories;
 using Abp.Domain.Uow;
-using Abp.Linq.Extensions;
 using Abp.ObjectMapping;
 using EmailSender.EmailSender.EmailSenderEntities;
 using EmailSender.EmailSender.QueueEmail.QueueEmailDto;
@@ -63,34 +62,44 @@ namespace EmailSender.EmailSender.QueueEmail
         }
         public async Task<PagedResultDto<QueuedEmailDto>> GetAllEmailsInQueueAsync(QueuePagedDto input)
         {
-            var query = CreateFilteredQuery(input);
+            var query =  CreateFilteredQueryAsync(input);
             var totalCount = await query.CountAsync();
 
             // Apply sorting and pagination
             var pagedEmails = await query
-                .OrderBy(p => p.Id)
-                .PageBy(input)
-                .AsNoTracking()
-                .ToListAsync();
+                      .OrderBy(p => p.Id)
+                      .PageBy(input.SkipCount, input.MaxResultCount)
+                      .AsNoTracking()
+                        .ToListAsync();
+
 
             var queuedDto = _objectMapper.Map<List<QueuedEmailDto>>(pagedEmails);
             return new PagedResultDto<QueuedEmailDto>(totalCount, queuedDto);
         }
 
-        protected IQueryable<EmailQueue> CreateFilteredQuery(QueuePagedDto input)
+        protected IQueryable<EmailQueue> CreateFilteredQueryAsync(QueuePagedDto input)
         {
-            return Abp.Linq.Extensions.QueryableExtensions.WhereIf(
-                    _queuedRepository.GetAll(),
-                     !string.IsNullOrWhiteSpace(input.Keyword),
-                         queue => queue.To.Contains(input.Keyword)                              
-                              || queue.From.Contains(input.Keyword)
-                               || queue.Subject.Contains(input.Keyword)                               
-                        );
+
+            return _queuedRepository.GetAll()
+                     .WhereIf(!string.IsNullOrWhiteSpace(input.Keyword),
+                         queue => queue.To.Contains(input.Keyword) ||
+                     queue.From.Contains(input.Keyword) ||
+                     queue.Subject.Contains(input.Keyword));
+                                     
         }
         public async Task<QueuedEmailDto> GetQueueMailById(int emailId)
         {
             var email = await _queuedRepository.GetAsync(emailId);
             return _objectMapper.Map<QueuedEmailDto>(email);
+        }
+
+        public async Task<List<QueuedEmailDto>> GetPendingEmailsTWAsync(int tenantid)
+        {
+            using (var unitOfWork = _unitOfWorkManager.Current.SetTenantId(tenantid)) {
+                var queued = await _queuedRepository.GetAllListAsync(q => q.Status != "Sent" && q.RetryCount < 5);
+                return _objectMapper.Map<List<QueuedEmailDto>>(queued);
+            }
+            
         }
     }
 }

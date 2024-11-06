@@ -2,6 +2,7 @@
 using Abp.Runtime.Session;
 using EmailSender.EmailSender.EmailTempalateManagers;
 using EmailSender.EmailSender.EmailTempalateManagers.EmailDto;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -17,11 +18,16 @@ namespace EmailSender.EmailServices.EmailTemplates
             _abpSession = abpsession;
         }
 
-        //show Template
-        public async Task<PagedResultDto<EmailTemplateDto>> GetTemplate(EmailTemplatepagedDto input)
+       
+            public async Task<PagedResultDto<EmailTemplateDto>> GetTemplate(EmailTemplatepagedDto input)
+            {
+                return await _emailtemplate.GetAllTemplatesAsync(input);
+            }
+
+        public async Task<PagedResultDto<EmailTemplateDto>> HostGetTemplate([FromQuery] EmailTemplatepagedDto input)
         {
-            return await _emailtemplate.GetAllTemplatesAsync(input);
-        }
+                return await _emailtemplate.HostGetAllTemplatesAsync(input);
+         }
 
         public async Task CreateOrEditTemplate(EmailTemplateDto templateDto)
         {

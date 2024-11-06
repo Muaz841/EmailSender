@@ -20,9 +20,10 @@ class EmailTemplateRequestDto extends PagedRequestDto {
 
 @Component({
   selector: 'app-email-templates',
-  templateUrl: './email-templates.component.html',
+  templateUrl: 'email-templates.html',
 })
 export class EmailTemplatesComponent extends PagedListingComponentBase<EmailTemplateDto> {
+  
   keyword = "";
   status = "";
   sorting = "";
@@ -30,6 +31,7 @@ export class EmailTemplatesComponent extends PagedListingComponentBase<EmailTemp
   selectedEmail: EmailTemplateDto = new EmailTemplateDto;
   visible: boolean = false;
   tokenList: string[] = [];
+
 
 
   @Output() onSave = new EventEmitter<any>();
@@ -66,11 +68,20 @@ protected list(request: EmailTemplateRequestDto, pageNumber: number, finishedCal
 
 
 protected delete(entity: EmailTemplateDto): void {
-  this._emailService.deleteTemplate(entity.id).subscribe(
-    response => {             
-     console.log("deleted");
-     
-    });
+  abp.message.confirm(
+    `Are you sure you want to delete the email template "${entity.name}"?`, 
+    undefined,
+    (result: boolean) => {
+      if (result) {       
+        this._emailService.deleteTemplate(entity.id).subscribe(
+          response => {
+            abp.notify.success('Successfully deleted the email template.'); 
+            this.refresh();
+          }
+        );
+      }
+    }
+  );
 }
 
 showDialog(email: EmailTemplateDto) {
@@ -94,9 +105,15 @@ parseTokens(tokenString: string | null): string[] {
   return tokenString ? tokenString.split(',').map(token => token.trim()) : [];
 }
 
+
 openCreateTemplateModal() {
   const initialState = { createEmail: new EmailTemplateDto() };
-  this._modalService.show(CreateTemplatesComponent,);
+  const modalRef: BsModalRef = this._modalService.show(CreateTemplatesComponent, { initialState });
+
+  // Listen to the onSave event from CreateTemplatesComponent
+  modalRef.content?.onSave.subscribe(() => {
+    this.refresh(); // Refresh the list when the template is saved
+  });
 }
 
 

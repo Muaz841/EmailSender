@@ -14,10 +14,10 @@ import { CommonModule } from '@angular/common';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { ButtonModule } from 'primeng/button';
 import {CreateTemplatesComponent} from './createTemplate/createTemplateComponent.'
-import { TemplateEmailServiceServiceProxy } from '@shared/service-proxies/service-proxies';
+import {HostEmailTemplatesComponent} from './host-template-component'
 
 @NgModule({
-    declarations: [EmailTemplatesComponent, CreateTemplatesComponent],
+    declarations: [EmailTemplatesComponent, CreateTemplatesComponent, HostEmailTemplatesComponent],
     imports: [DialogModule,FormsModule,DropdownModule,TableModule,AccordionModule,CommonModule,ButtonModule,
         EditorModule,emailTemplateRoutingModule,SharedModule,FieldsetModule,TabViewModule,FloatLabelModule],
 

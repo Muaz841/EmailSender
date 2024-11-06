@@ -1,30 +1,36 @@
-﻿using Abp.Configuration;
+﻿    using Abp.Configuration;
 using Abp.MultiTenancy;
 using Abp.Net.Mail;
-using EmailSender.Authorization.Users;
-using EmailSender.EmailServices.EmailSettings.EmailSettingsDto;
+using Abp.Runtime.Session;
+using EmailSender.EmailSender;
+using EmailSender.EmailSender.EmailSenderManager.SmtpDto;
+using EmailSender.EmailServices.QueueEmail;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+
 
 namespace EmailSender.EmailServices.EmailSettings
 {
     public class SmtpSettingsService : EmailSenderAppServiceBase
     {
         private readonly ISettingManager _settingManager;
-        public SmtpSettingsService(ISettingManager settingManager)
+        private readonly IAbpSession _abpSession;
+        private readonly IEmailSenderManager _emailSenderManager;
+        private readonly IQueueEmailService _queueEmailService;
+        public SmtpSettingsService(ISettingManager settingManager, IAbpSession abpSession, IQueueEmailService queueEmailService, IEmailSenderManager emailSenderManager)
         {
             _settingManager = settingManager;
+            _abpSession = abpSession;
+            _queueEmailService = queueEmailService;
+            _emailSenderManager = emailSenderManager;
         }
 
-        public async Task<SmtpSettingsDto> GetSmtpSettingsAsync(int? tenantid)
+        public async Task<SmtpSettingsDto> GetSmtpSettingsAsync()
         {
-            var Id = tenantid.HasValue && tenantid.Value != 0 ? tenantid.Value :  MultiTenancyConsts.DefaultTenantId;
-          
+            var Id = _abpSession.TenantId.Value;
+
             var settings = new SmtpSettingsDto
-            {
+            {   
                 Host = await _settingManager.GetSettingValueForTenantAsync(EmailSettingNames.Smtp.Host, Id),
                 Port = await _settingManager.GetSettingValueForTenantAsync(EmailSettingNames.Smtp.Port, Id),
                 UserName = await _settingManager.GetSettingValueForTenantAsync(EmailSettingNames.Smtp.UserName, Id),
@@ -35,15 +41,37 @@ namespace EmailSender.EmailServices.EmailSettings
             };
             return settings;
         }
-        public async Task UpdateSmtpSettingsAsync(SmtpSettingsDto input)
+
+
+        public async Task CreateSmtpSettingsAsync(SmtpSettingsDto input)
         {
-            await _settingManager.ChangeSettingForApplicationAsync(EmailSettingNames.Smtp.Host, input.Host);
-            await _settingManager.ChangeSettingForApplicationAsync(EmailSettingNames.Smtp.Port, input.Port);
-            await _settingManager.ChangeSettingForApplicationAsync(EmailSettingNames.Smtp.UserName, input.UserName);
-            await _settingManager.ChangeSettingForApplicationAsync(EmailSettingNames.Smtp.Password, input.Password);
-            await _settingManager.ChangeSettingForApplicationAsync(EmailSettingNames.Smtp.Domain, input.Domain);
-            await _settingManager.ChangeSettingForApplicationAsync(EmailSettingNames.Smtp.EnableSsl, input.EnableSsl.ToString());
-            
+            var id = _abpSession.TenantId.HasValue && _abpSession.TenantId.Value != 0 ? _abpSession.TenantId.Value : MultiTenancyConsts.DefaultTenantId;
+
+            await _settingManager.ChangeSettingForTenantAsync(id, EmailSettingNames.Smtp.Host, input.Host);
+            await _settingManager.ChangeSettingForTenantAsync(id, EmailSettingNames.Smtp.Port, input.Port.ToString());
+            await _settingManager.ChangeSettingForTenantAsync(id, EmailSettingNames.Smtp.UserName, input.UserName);
+            await _settingManager.ChangeSettingForTenantAsync(id, EmailSettingNames.Smtp.Password, input.Password);
+            await _settingManager.ChangeSettingForTenantAsync(id, EmailSettingNames.Smtp.Domain, input.Domain);
+            await _settingManager.ChangeSettingForTenantAsync(id, EmailSettingNames.Smtp.EnableSsl, input.EnableSsl.ToString());
+            await _settingManager.ChangeSettingForTenantAsync(id, EmailSettingNames.DefaultFromAddress, input.SenderEmail); 
+        }
+
+        public async Task UpdateTenantSmtpSettingsAsync(SmtpSettingsDto input)
+        {
+            var id = _abpSession.TenantId.HasValue && _abpSession.TenantId.Value != 0 ? _abpSession.TenantId.Value : MultiTenancyConsts.DefaultTenantId;
+            // Update the SMTP settings for the specified tenant
+            await _settingManager.ChangeSettingForTenantAsync(id, EmailSettingNames.Smtp.Host, input.Host);
+            await _settingManager.ChangeSettingForTenantAsync(id, EmailSettingNames.Smtp.Port, input.Port.ToString());
+            await _settingManager.ChangeSettingForTenantAsync(id, EmailSettingNames.Smtp.UserName, input.UserName);
+            await _settingManager.ChangeSettingForTenantAsync(id, EmailSettingNames.Smtp.Password, input.Password);
+            await _settingManager.ChangeSettingForTenantAsync(id, EmailSettingNames.Smtp.Domain, input.Domain);
+            await _settingManager.ChangeSettingForTenantAsync(id, EmailSettingNames.Smtp.EnableSsl, input.EnableSsl.ToString());
+            await _settingManager.ChangeSettingForTenantAsync(id, EmailSettingNames.DefaultFromAddress, input.SenderEmail);
+        }
+
+         public async Task TestMail(string TO)
+        {
+           await  _emailSenderManager.TestMail(TO);
         }
     }
 

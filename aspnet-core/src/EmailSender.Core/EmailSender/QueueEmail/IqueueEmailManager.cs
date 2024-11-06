@@ -17,6 +17,8 @@ namespace EmailSender.EmailSender.QueueEmail
         Task IncrementRetryCountAsync(int emailId);
         Task<PagedResultDto<QueuedEmailDto>> GetAllEmailsInQueueAsync(QueuePagedDto input);
         Task<QueuedEmailDto> GetQueueMailById(int emailId);
+
+        Task<List<QueuedEmailDto>> GetPendingEmailsTWAsync(int tenantid);
     }
 
 }

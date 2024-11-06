@@ -1,6 +1,7 @@
 ﻿using Abp.Application.Services.Dto;
 using Abp.Dependency;
 using Abp.Domain.Repositories;
+using Abp.Domain.Uow;
 using Abp.Linq.Extensions;
 using Abp.ObjectMapping;
 using EmailSender.EmailSender.EmailSenderEntities;
@@ -17,11 +18,13 @@ namespace EmailSender.EmailSender.EmailTempalateManagers
     {
         private readonly IRepository<EmailTemplate, int> templateRepository;
         private readonly IObjectMapper _objectMapper;
+        private readonly IUnitOfWorkManager _unitOfWorkManager;
 
-        public EmailTemplateManager(IRepository<EmailTemplate, int> emailTemplateRepository, IObjectMapper objectMapper)
+        public EmailTemplateManager(IUnitOfWorkManager unitOfWorkManager,  IRepository<EmailTemplate, int> emailTemplateRepository, IObjectMapper objectMapper)
         {
             templateRepository = emailTemplateRepository;
             this._objectMapper = objectMapper;
+            _unitOfWorkManager = unitOfWorkManager;
         }
 
         public async Task<EmailTemplateDto> CreateTemplateAsync(EmailTemplateDto templateDto)
@@ -55,14 +58,7 @@ namespace EmailSender.EmailSender.EmailTempalateManagers
             var queuedDto = _objectMapper.Map<List<EmailTemplateDto>>(pagedEmails);
             return new PagedResultDto<EmailTemplateDto>(totalCount, queuedDto);
         }
-        protected IQueryable<EmailTemplate> CreateFilteredQuery(EmailTemplatepagedDto input)
-        {
-            return Abp.Linq.Extensions.QueryableExtensions.WhereIf(
-                    templateRepository.GetAll(),
-                     !string.IsNullOrWhiteSpace(input.Keyword),
-                         queue => queue.Subject.Contains(input.Keyword)                              
-              );
-        }
+  
         public async Task<EmailTemplateDto> GetTemplateByIdAsync(int tenantId)
         {
 
@@ -74,6 +70,43 @@ namespace EmailSender.EmailSender.EmailTempalateManagers
         {
             var template = await templateRepository.GetAsync(updatetemplate.Id);
             _objectMapper.Map(updatetemplate, template);
+        }
+
+       public async  Task<PagedResultDto<EmailTemplateDto>> HostGetAllTemplatesAsync(EmailTemplatepagedDto input)
+        {
+            
+            var query = DisabledDeletedQuery(input);
+            var totalCount = await query.CountAsync();
+
+            // Apply sorting and pagination
+            var pagedEmails = await query
+                .OrderBy(p => p.Id)
+                .PageBy(input)
+                .AsNoTracking()
+                .ToListAsync();
+            var queuedDto = _objectMapper.Map<List<EmailTemplateDto>>(pagedEmails);
+            return new PagedResultDto<EmailTemplateDto>(totalCount, queuedDto);
+        }
+
+        protected IQueryable<EmailTemplate> CreateFilteredQuery(EmailTemplatepagedDto input)
+        {
+            return Abp.Linq.Extensions.QueryableExtensions.WhereIf(
+                    templateRepository.GetAll(),
+                     !string.IsNullOrWhiteSpace(input.Keyword),
+                         queue => queue.Subject.Contains(input.Keyword)
+              );
+        }
+
+        protected IQueryable<EmailTemplate> DisabledDeletedQuery(EmailTemplatepagedDto input)
+        {
+            using (_unitOfWorkManager.Current.DisableFilter(AbpDataFilters.SoftDelete))
+            {
+                return Abp.Linq.Extensions.QueryableExtensions.WhereIf(
+                    templateRepository.GetAll(),
+                     !string.IsNullOrWhiteSpace(input.Keyword),
+                         queue => queue.Subject.Contains(input.Keyword)
+              );
+            }
         }
     }
 }

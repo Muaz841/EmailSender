@@ -9,5 +9,6 @@ namespace EmailSender.EmailServices.QueueEmail
     public interface IQueueEmailService 
     {
         Task<PagedResultDto<QueuedEmailDto>> GetEmailsInQueue(QueuePagedDto input);
+       
     }
 }

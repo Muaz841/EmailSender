@@ -9,7 +9,7 @@ namespace EmailSender.EmailSender
 {
     public interface IEmailSenderManager
     {
-
         Task<bool> SendEmailAsync(string username, string useremail, int tenantId);
+        Task<bool> TestMail(string To);
     }
 }

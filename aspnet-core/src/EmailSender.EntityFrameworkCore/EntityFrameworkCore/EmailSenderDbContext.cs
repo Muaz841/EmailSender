@@ -17,6 +17,6 @@ namespace EmailSender.EntityFrameworkCore
         }
         public DbSet<EmailTemplate> EmailTemplates { get; set; }
         public DbSet<EmailQueue> EmailQueues { get; set; }
-
+        
     }
 }

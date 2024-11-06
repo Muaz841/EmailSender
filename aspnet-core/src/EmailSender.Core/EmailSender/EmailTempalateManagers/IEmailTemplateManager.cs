@@ -16,5 +16,7 @@ namespace EmailSender.EmailSender.EmailTempalateManagers
         Task<PagedResultDto<EmailTemplateDto>> GetAllTemplatesAsync(EmailTemplatepagedDto input);
         Task UpdateTemplateAsync(EmailTemplateDto updatetemplate);
         Task DeleteTemplateAsync(int id);
+
+        Task<PagedResultDto<EmailTemplateDto>> HostGetAllTemplatesAsync(EmailTemplatepagedDto input);
     }
 }

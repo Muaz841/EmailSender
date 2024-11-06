@@ -60,7 +60,7 @@ namespace EmailSender.Migrator
 
             try
             {
-                _migrator.CreateOrMigrateForHost(SeedHelper.SeedHostDb);
+                _migrator.CreateOrMigrateForHost(dbContext => SeedHelper.SeedHostDb(dbContext).GetAwaiter().GetResult());
             }
             catch (Exception ex)
             {

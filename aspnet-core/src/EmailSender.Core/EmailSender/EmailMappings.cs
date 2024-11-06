@@ -33,7 +33,7 @@ namespace EmailSender.EmailSender
                 .ForMember(e => e.Token, options => options.MapFrom(src => src.Token))
                 .ForMember(e => e.Cc, options => options.MapFrom(src => src.Cc));
 
-                //EmailTemplate -> EmailTemplateDto
+                //EmailTemplate <- EmailTemplateDto
                 config.CreateMap<EmailTemplate, EmailTemplateDto>()
                 .ForMember(e => e.TenantId, options => options.MapFrom(src => src.TenantId))
                 .ForMember(e => e.Name, options => options.MapFrom(src => src.Name))

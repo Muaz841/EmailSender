@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Abp.Application.Services;
 using Abp.Application.Services.Dto;
@@ -116,6 +117,12 @@ namespace EmailSender.MultiTenancy
         private void CheckErrors(IdentityResult identityResult)
         {
             identityResult.CheckErrors(LocalizationManager);
+        }
+
+        public async Task<List<TenantDto>> GetAllTenantsAsync()
+        {
+            var tenants = await Repository.GetAllListAsync();
+            return ObjectMapper.Map<List<TenantDto>>(tenants);
         }
     }
 }

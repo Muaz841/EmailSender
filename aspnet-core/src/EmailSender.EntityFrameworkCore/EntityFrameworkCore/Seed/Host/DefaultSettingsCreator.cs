@@ -27,17 +27,18 @@ namespace EmailSender.EntityFrameworkCore.Seed.Host
             }
 
             // Emailing +     //smtp
-            AddSettingIfNotExists(EmailSettingNames.DefaultFromAddress, "solvefy@mydomain.com", tenantId);
-            AddSettingIfNotExists(EmailSettingNames.DefaultFromDisplayName, "solvefy", tenantId);        
-            AddSettingIfNotExists(EmailSettingNames.Smtp.Host, "sandbox.smtp.mailtrap.io", tenantId);
-            AddSettingIfNotExists(EmailSettingNames.Smtp.Port, "2525", tenantId);
-            AddSettingIfNotExists(EmailSettingNames.Smtp.UserName, "90e3ee095f3aca", tenantId);
-            AddSettingIfNotExists(EmailSettingNames.Smtp.Password, "f5ae4075ab1cf9", tenantId);
+            AddSettingIfNotExists(EmailSettingNames.DefaultFromAddress, "your email address ??", tenantId);
+            AddSettingIfNotExists(EmailSettingNames.DefaultFromDisplayName, "your name ??", tenantId);        
+            AddSettingIfNotExists(EmailSettingNames.Smtp.Host, "your host ??", tenantId);
+            AddSettingIfNotExists(EmailSettingNames.Smtp.Port, "your port ??", tenantId);
+            AddSettingIfNotExists(EmailSettingNames.Smtp.UserName, "username ??", tenantId);
+            AddSettingIfNotExists(EmailSettingNames.Smtp.Password, "password ??", tenantId);
             AddSettingIfNotExists(EmailSettingNames.Smtp.EnableSsl, "true", tenantId);
-            AddSettingIfNotExists(EmailSettingNames.Smtp.Domain, "Solvefydomain.com", tenantId);
+            AddSettingIfNotExists(EmailSettingNames.Smtp.Domain, "domain ??", tenantId);
             AddSettingIfNotExists(EmailSettingNames.Smtp.UseDefaultCredentials, "false", tenantId);
             // Languages
             AddSettingIfNotExists(LocalizationSettingNames.DefaultLanguage, "en", tenantId);
+
         }
 
         private void AddSettingIfNotExists(string name, string value, int? tenantId = null)
