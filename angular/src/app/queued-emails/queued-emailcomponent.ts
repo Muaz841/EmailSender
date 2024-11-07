@@ -51,9 +51,6 @@ protected list(request: queuedEmailRequestDto, pageNumber: number, finishedCallb
       });          
 }
 
- refresh(): void {
-  this.refresh();
- }
 protected delete(entity: QueuedEmailDto): void {
   throw new Error('Method not implemented.');
 }

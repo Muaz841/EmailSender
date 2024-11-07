@@ -1,14 +1,15 @@
+<div [@routerTransition]>
+  <section class="content-header mb-2">
+    <h1>{{ "smtpsettings" | localize }}</h1>
+  </section>
+</div>
 <section class="content px-2">
   <div class="container-fluid">
     <div class="card">
       <div class="card-body">
         <tabset>
-          <tab [heading]="'smtpsettings' | localize" class="pt-2 px-2" [busy]="loading">
-            <div [@routerTransition]>
-              <section class="content-header mb-2">
-                <h1>{{ "Settings" | localize }}</h1>
-              </section>
-            </div>
+          <tab [heading]="'SMTP' | localize" class="pt-2 px-2" [busy]="loading">
+          
 
             <div class="container-fluid px-2">
               <div class="row">
