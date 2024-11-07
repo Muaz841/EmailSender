@@ -90,7 +90,7 @@ namespace EmailSender.EmailSender.EmailSender
                 {
                     From = new MailAddress(smtpSettings.SenderEmail),
                     Subject = "Testingmail",
-                    Body = "this is a credentials checking mail",
+                    Body  = "This is A testing mail",
                     IsBodyHtml = true
                 };
                 mailMessage.To.Add(To);

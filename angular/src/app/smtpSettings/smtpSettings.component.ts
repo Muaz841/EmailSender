@@ -14,7 +14,7 @@ import { appModuleAnimation } from '@shared/animations/routerTransition';
   
   @Component({
     animations: [appModuleAnimation()],    
-    templateUrl: './smtpSettings.html',
+    templateUrl: 'smtpSettings.html',
   })
 
   export class SmtpSettingsComponent  implements OnInit {
@@ -49,9 +49,9 @@ import { appModuleAnimation } from '@shared/animations/routerTransition';
       abp.notify.success(('SuccessfullySaved'));    
   }
 
-  testMail(TO)
+  testMail(to)
   {
-    this.smtpSettingsService.testMail(TO).subscribe(
+    this.smtpSettingsService.testMail(to).subscribe(
       response => {});
       this.to = ''
       abp.notify.success(('Mail Sent'));

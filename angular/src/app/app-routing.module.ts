@@ -49,11 +49,6 @@ import { AppComponent } from './app.component';
                         canActivate: [AppRouteGuard]
                     },
                     {
-                        path: 'host-Template',
-                        loadChildren: () => import('./email-templates/email-template-module').then((m) => m.emailtemplatemodule),
-                        canActivate: [AppRouteGuard]
-                    },
-                    {
                         path: 'queued-email',
                         loadChildren: () => import('./queued-emails/queued-email-module').then((m) => m.queuedEmailModule),
                         canActivate: [AppRouteGuard]

@@ -49,7 +49,7 @@ protected list(request: queuedEmailRequestDto, pageNumber: number, finishedCallb
         
         this.showPaging(result, pageNumber);
         console.log(result.items, "result");
-      });    
+      });          
 }
 
 
@@ -59,7 +59,13 @@ protected delete(entity: QueuedEmailDto): void {
 queuedemails : QueuedEmailDto[] = [];
 keyword = '';
 
-
+protected updateFailed(id)
+{
+  this._queuedService.updateFailedMails(id).subscribe(
+    response => {});
+    abp.notify.success(('status updated'));
+    this.refresh();
+}
 
 
 showDialog(email: QueuedEmailDto) {

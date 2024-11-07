@@ -35,6 +35,10 @@ namespace EmailSender.EmailService
             return await _queueemail.GetQueueMailById(id);
         }
 
+        public async  Task UpdateFailedMails(int id)
+        {
+             await  _queueemail.UpdateFailedMails(id);
+        }
         
     }
 }

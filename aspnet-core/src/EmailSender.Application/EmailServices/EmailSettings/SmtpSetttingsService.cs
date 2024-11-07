@@ -2,6 +2,7 @@
 using Abp.MultiTenancy;
 using Abp.Net.Mail;
 using Abp.Runtime.Session;
+using Abp.UI;
 using EmailSender.EmailSender;
 using EmailSender.EmailSender.EmailSenderManager.SmtpDto;
 using EmailSender.EmailServices.QueueEmail;
@@ -27,6 +28,10 @@ namespace EmailSender.EmailServices.EmailSettings
 
         public async Task<SmtpSettingsDto> GetSmtpSettingsAsync()
         {
+            if (!_abpSession.TenantId.HasValue)
+            {
+                throw new UserFriendlyException("Please Add SMTP SETTINGS.");
+            }
             var Id = _abpSession.TenantId.Value;
 
             var settings = new SmtpSettingsDto

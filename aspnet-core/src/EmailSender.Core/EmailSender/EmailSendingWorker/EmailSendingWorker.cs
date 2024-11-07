@@ -14,6 +14,7 @@ using EmailSender.MultiTenancy;
 using Abp.Domain.Repositories;
 using static EmailSender.Authorization.Roles.StaticRoleNames;
 using static EmailSender.EmailSender.EmailSenderManager.SmtpDto.SmtpSettingsMethod;
+using Castle.Facilities.TypedFactory.Internal;
 
 
 namespace EmailSender.EmailSender.EmailWorker
@@ -58,14 +59,25 @@ namespace EmailSender.EmailSender.EmailWorker
                     int TenantId = tenant.Id;
                     //Fetching-SMTP SETTINGS
                     var smtpSettings = await SmtpSettingsHelper.GetSmtpSettingsAsync(_settingManager, TenantId);
-
+                   
                     var emails = await _emailQueueRepository.GetPendingEmailsTWAsync(TenantId);
-                    if (emails == null) { return; }
+
+                    if (emails == null) { continue; }
 
                     foreach (var email in emails)
                     {
                         try
                         {
+                            if (smtpSettings == null ||
+                             string.IsNullOrEmpty(smtpSettings.Host) ||
+                              string.IsNullOrEmpty(smtpSettings.Port.ToString()) ||
+                             string.IsNullOrEmpty(smtpSettings.UserName) ||
+                             string.IsNullOrEmpty(smtpSettings.Password))
+                            {
+                                await _emailQueueRepository.IncrementRetryCountAsync(email.Id);
+                                continue; // Skip this email and retry later
+                            }
+
                             using (var client = new SmtpClient(smtpSettings.Host, Int32.Parse(smtpSettings.Port))
                             {
                                 Credentials = new NetworkCredential(smtpSettings.UserName, smtpSettings.Password),

@@ -20,7 +20,7 @@ import {
   
   @Component({
     selector: 'app-email-templates',
-    templateUrl: 'email-templates.html',
+    templateUrl: './host-template.html',
   })
   export class HostEmailTemplatesComponent extends PagedListingComponentBase<EmailTemplateDto> {
     
@@ -52,7 +52,7 @@ import {
   protected list(request: EmailTemplateRequestDto, pageNumber: number, finishedCallback: Function): void {
     request.keyword = this.keyword;
   
-    this._emailService.hostGetTemplate( request.keyword,request.status, request.sorting,  request.skipCount,
+    this._emailService.getHostTemplate( request.keyword,request.status, request.sorting,  request.skipCount,
       request.maxResultCount).pipe(
         finalize(() => {
           finishedCallback();
@@ -110,9 +110,8 @@ import {
     const initialState = { createEmail: new EmailTemplateDto() };
     const modalRef: BsModalRef = this._modalService.show(CreateTemplatesComponent, { initialState });
   
-    // Listen to the onSave event from CreateTemplatesComponent
     modalRef.content?.onSave.subscribe(() => {
-      this.refresh(); // Refresh the list when the template is saved
+      this.refresh(); 
     });
   }
   

@@ -347,6 +347,58 @@ export class QueueEmailServiceServiceProxy {
         }
         return _observableOf(null as any);
     }
+
+    /**
+     * @param id (optional) 
+     * @return OK
+     */
+    updateFailedMails(id: number | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/QueueEmailService/UpdateFailedMails?";
+        if (id === null)
+            throw new Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateFailedMails(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateFailedMails(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processUpdateFailedMails(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 @Injectable()
@@ -1187,8 +1239,8 @@ export class TemplateEmailServiceServiceProxy {
      * @param maxResultCount (optional) 
      * @return OK
      */
-    hostGetTemplate(keyword: string | undefined, status: string | undefined, sorting: string | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<EmailTemplateDtoPagedResultDto> {
-        let url_ = this.baseUrl + "/api/services/app/TemplateEmailService/HostGetTemplate?";
+    getHostTemplate(keyword: string | undefined, status: string | undefined, sorting: string | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<EmailTemplateDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/TemplateEmailService/GetHostTemplate?";
         if (keyword === null)
             throw new Error("The parameter 'keyword' cannot be null.");
         else if (keyword !== undefined)
@@ -1219,12 +1271,12 @@ export class TemplateEmailServiceServiceProxy {
             })
         };
 
-        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processHostGetTemplate(response_);
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetHostTemplate(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processHostGetTemplate(response_ as any);
+                    return this.processGetHostTemplate(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<EmailTemplateDtoPagedResultDto>;
                 }
@@ -1233,7 +1285,7 @@ export class TemplateEmailServiceServiceProxy {
         }));
     }
 
-    protected processHostGetTemplate(response: HttpResponseBase): Observable<EmailTemplateDtoPagedResultDto> {
+    protected processGetHostTemplate(response: HttpResponseBase): Observable<EmailTemplateDtoPagedResultDto> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :

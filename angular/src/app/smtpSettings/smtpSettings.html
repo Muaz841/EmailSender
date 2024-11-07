@@ -1,4 +1,4 @@
-<div class="container-fluid " style="padding: 1.5rem;">
+ <div class="container-fluid " style="padding: 1.5rem;">
   SMTP host
   <input type="text" [(ngModel)]="smtpSettingsList.host" class="col-md-12 form-control" />
   <br>
@@ -8,8 +8,13 @@
   PORT
   <input type="text" [(ngModel)]="smtpSettingsList.port" class="col-md-12 form-control" />
   <br>
-  Use SSL
-  <input type="text" [(ngModel)]="smtpSettingsList.enableSsl" class="col-md-12 form-control" />
+
+  <div class="form-check">
+    <input type="checkbox" [(ngModel)]="smtpSettingsList.enableSsl" class="form-check-input" id="enableSsl">
+    <label class="form-check-label" for="enableSsl">
+      Use SSL
+    </label>
+  </div>
   <br>
   Domain name
   <input type="text" [(ngModel)]="smtpSettingsList.domain" class="col-md-12 form-control" />
@@ -21,11 +26,12 @@
   <input type="text" [(ngModel)]="smtpSettingsList.password" class="col-md-12 form-control" />
   <br>
 
-  <input type="text" [(ngModel)]="to" />
-  <button (click)="testMail(to)" class="mx-1">
+  Test Email Settings
+  <br>
+  <input  style= "display: inline-block;" type="text" [(ngModel)]="to" class="col-md-4 form-control" />
+  <button (click)="testMail(to)" class="mx-1"  style= "display: inline-block;" >
     <i class="fa-solid fa-envelope-circle-check">
     </i></button>
-
   <br>
   <div class="saveBtn" style="display: flex; justify-content: flex-end;">
     <button (click)="saveChanges(smtpSettingsList)"
@@ -34,4 +40,6 @@
     </button>
   </div>
 
-</div>
+</div> 
+
+  

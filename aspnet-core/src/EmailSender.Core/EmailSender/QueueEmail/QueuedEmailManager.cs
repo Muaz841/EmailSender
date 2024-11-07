@@ -35,6 +35,10 @@ namespace EmailSender.EmailSender.QueueEmail
         {
             var email = await _queuedRepository.GetAsync(emailId);
             email.RetryCount++;
+            if(email.RetryCount >= 5)
+            {
+                email.Status = "Failed";
+            }
 
             using (var unitOfWork = _unitOfWorkManager.Begin(System.Transactions.TransactionScopeOption.RequiresNew))
             {
@@ -100,6 +104,19 @@ namespace EmailSender.EmailSender.QueueEmail
                 return _objectMapper.Map<List<QueuedEmailDto>>(queued);
             }
             
+        }
+
+        public async Task UpdateFailedMails(int emailId)
+        {
+            var email = await _queuedRepository.GetAsync(emailId);
+            email.RetryCount = 0; 
+            email.Status = "pending";
+
+            using (var unitOfWork = _unitOfWorkManager.Begin(System.Transactions.TransactionScopeOption.RequiresNew))
+            {
+                await _queuedRepository.UpdateAsync(email);
+                await unitOfWork.CompleteAsync();
+            }
         }
     }
 }

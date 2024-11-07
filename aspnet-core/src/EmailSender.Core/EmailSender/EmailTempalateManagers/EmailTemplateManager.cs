@@ -20,7 +20,7 @@ namespace EmailSender.EmailSender.EmailTempalateManagers
         private readonly IObjectMapper _objectMapper;
         private readonly IUnitOfWorkManager _unitOfWorkManager;
 
-        public EmailTemplateManager(IUnitOfWorkManager unitOfWorkManager,  IRepository<EmailTemplate, int> emailTemplateRepository, IObjectMapper objectMapper)
+        public EmailTemplateManager(IUnitOfWorkManager unitOfWorkManager, IRepository<EmailTemplate, int> emailTemplateRepository, IObjectMapper objectMapper)
         {
             templateRepository = emailTemplateRepository;
             this._objectMapper = objectMapper;
@@ -36,10 +36,10 @@ namespace EmailSender.EmailSender.EmailTempalateManagers
             return savedTemplateDto;
 
         }
-        
+
 
         public Task DeleteTemplateAsync(int id)
-        {            
+        {
             templateRepository.DeleteAsync(id);
             return Task.CompletedTask;
         }
@@ -58,7 +58,7 @@ namespace EmailSender.EmailSender.EmailTempalateManagers
             var queuedDto = _objectMapper.Map<List<EmailTemplateDto>>(pagedEmails);
             return new PagedResultDto<EmailTemplateDto>(totalCount, queuedDto);
         }
-  
+
         public async Task<EmailTemplateDto> GetTemplateByIdAsync(int tenantId)
         {
 
@@ -72,9 +72,9 @@ namespace EmailSender.EmailSender.EmailTempalateManagers
             _objectMapper.Map(updatetemplate, template);
         }
 
-       public async  Task<PagedResultDto<EmailTemplateDto>> HostGetAllTemplatesAsync(EmailTemplatepagedDto input)
+        public async Task<PagedResultDto<EmailTemplateDto>> HostGetAllTemplatesAsync(EmailTemplatepagedDto input)
         {
-            
+
             var query = DisabledDeletedQuery(input);
             var totalCount = await query.CountAsync();
 
@@ -99,13 +99,15 @@ namespace EmailSender.EmailSender.EmailTempalateManagers
 
         protected IQueryable<EmailTemplate> DisabledDeletedQuery(EmailTemplatepagedDto input)
         {
-            using (_unitOfWorkManager.Current.DisableFilter(AbpDataFilters.SoftDelete))
+            _unitOfWorkManager.Current.DisableFilter(AbpDataFilters.SoftDelete);
+
             {
                 return Abp.Linq.Extensions.QueryableExtensions.WhereIf(
                     templateRepository.GetAll(),
                      !string.IsNullOrWhiteSpace(input.Keyword),
                          queue => queue.Subject.Contains(input.Keyword)
               );
+
             }
         }
     }

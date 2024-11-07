@@ -51,7 +51,16 @@
               <td>{{ email.to }}</td>
               <td>{{ email.subject }}</td>
               <td>
-                <p-tag [value]="email.status" [severity]="email.status == 'sent' ? 'success' : 'danger'"></p-tag>
+               
+                <ng-container *ngIf="email.status === 'Failed'; else showTag">
+                  <button type="button" class="btn btn-sm bg-warning" (click)="updateFailed(email.id)">
+                    {{ "Retry" | localize }}
+                  </button>
+                </ng-container>                
+            
+                <ng-template #showTag>
+                  <p-tag [value]="email.status" [severity]="email.status == 'sent' ? 'success' : 'danger'"></p-tag>
+                </ng-template>
               </td>
 
             </tr>

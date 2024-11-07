@@ -1,4 +1,4 @@
-<!-- <section class="content-header">
+<section class="content-header">
     <div class="container-fluid">
       <div class="row">
         <div class="col-6">
@@ -33,8 +33,7 @@
         <p-table [value]="emailTemplate" [tableStyle]="{ 'min-width': '50rem' }">
           <ng-template pTemplate="header">
             <tr class="table-active">
-              <th style="width: 15%">Action</th>
-              <th style="width: 25%">Name</th>
+              <th style="width: 15%">Action</th>              
               <th style="width: 30%">Subject</th>           
             </tr>
           </ng-template>
@@ -48,8 +47,7 @@
                 <button type="button" class="btn btn-sm bg-danger" (click)="delete(email)">
                   <i class="fas fa-trash-alt"></i>               
                 </button>
-              </td>
-              <td>{{ email.name }}</td>
+              </td>           
               <td>{{ email.subject}}</td>         
             </tr>
           </ng-template>
@@ -92,6 +90,4 @@
         </p-tabView>
       </div>
     </div>  
-  </p-dialog> -->
-
-  allworking
+  </p-dialog>

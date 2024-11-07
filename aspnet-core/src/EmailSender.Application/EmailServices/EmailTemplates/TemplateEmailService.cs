@@ -24,7 +24,7 @@ namespace EmailSender.EmailServices.EmailTemplates
                 return await _emailtemplate.GetAllTemplatesAsync(input);
             }
 
-        public async Task<PagedResultDto<EmailTemplateDto>> HostGetTemplate([FromQuery] EmailTemplatepagedDto input)
+        public async Task<PagedResultDto<EmailTemplateDto>> GetHostTemplate(EmailTemplatepagedDto input)
         {
                 return await _emailtemplate.HostGetAllTemplatesAsync(input);
          }

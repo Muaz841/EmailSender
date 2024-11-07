@@ -64,13 +64,13 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
             new MenuItem(this.l('Email'), '', 'fas fa-message', '', [
                 new MenuItem(
                     this.l('Template'),
-                    '/app/email-Template',
+                    '/app/email-Template/email-Template',
                     'fas fa-message',
                     
                 ),
                 new MenuItem(
                     this.l('All Template'),
-                    '/app/host-Template',
+                    '/app/email-Template/host-Template',
                     'fas fa-message',
                     'Pages.Tenants',
                     

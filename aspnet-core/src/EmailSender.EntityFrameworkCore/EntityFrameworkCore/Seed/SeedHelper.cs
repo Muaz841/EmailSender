@@ -10,6 +10,9 @@ using EmailSender.EntityFrameworkCore.Seed.Tenants;
 using EmailSender.EntityFrameworkCore.Seed.Email;
 using System.Threading.Tasks;
 using Abp.Runtime.Session;
+using Abp.Domain.Repositories;
+using EmailSender.MultiTenancy;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace EmailSender.EntityFrameworkCore.Seed
 {
@@ -24,13 +27,20 @@ namespace EmailSender.EntityFrameworkCore.Seed
         {
             context.SuppressAutoSetTenantId = true;
 
-            // Host seed
+           
             new InitialHostDbBuilder(context).Create();
 
-            // Default tenant seed (in host database).
+         
             new DefaultTenantBuilder(context).Create();
-            new TenantRoleAndUserBuilder(context, 1).Create();  
-           await  new EmailTemplateBuilder(context,1).Create();
+            new TenantRoleAndUserBuilder(context, 1).Create();
+
+            
+            var abpSession = context.GetService<IAbpSession>();
+            var tenantRepository = context.GetService<IRepository<Tenant, int>>();
+            var unitOfWorkManager = context.GetService<IUnitOfWorkManager>();
+
+            
+            await new EmailTemplateBuilder(context, abpSession, tenantRepository, unitOfWorkManager).Create();
         }
 
         private static async Task WithDbContextAsync<TDbContext>(IIocResolver iocResolver, Func<TDbContext, Task> contextAction)

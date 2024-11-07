@@ -9,7 +9,7 @@ import { HostEmailTemplatesComponent } from './host-template-component';
 
 const routes: Routes = [
     {
-        path: '',
+        path: 'email-Template',
         component: EmailTemplatesComponent,
         pathMatch: 'full',
     },

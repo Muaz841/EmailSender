@@ -19,6 +19,8 @@ namespace EmailSender.EmailSender.QueueEmail
         Task<QueuedEmailDto> GetQueueMailById(int emailId);
 
         Task<List<QueuedEmailDto>> GetPendingEmailsTWAsync(int tenantid);
+
+        Task UpdateFailedMails(int emailId);
     }
 
 }
