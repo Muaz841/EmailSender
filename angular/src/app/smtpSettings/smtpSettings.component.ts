@@ -22,6 +22,7 @@ import { appModuleAnimation } from '@shared/animations/routerTransition';
     smtpSettingsList: SmtpSettingsDto = new SmtpSettingsDto(); 
     editSmtpSetting: SmtpSettingsDto = new SmtpSettingsDto();
     to : string ;
+    loading : boolean = false;
 
     constructor(
       private smtpSettingsService: SmtpSettingsServiceServiceProxy,
@@ -54,7 +55,7 @@ import { appModuleAnimation } from '@shared/animations/routerTransition';
     this.smtpSettingsService.testMail(to).subscribe(
       response => {});
       this.to = ''
-      abp.notify.success(('Mail Sent'));
+      abp.notify.success(('TRIED'));
   }
 
   }

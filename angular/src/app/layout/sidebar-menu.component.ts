@@ -69,7 +69,7 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
                     
                 ),
                 new MenuItem(
-                    this.l('All Template'),
+                    this.l('Template'),
                     '/app/email-Template/host-Template',
                     'fas fa-message',
                     'Pages.Tenants',
@@ -81,7 +81,7 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
                     'fas fa-message',                    
                 ),
                 new MenuItem(
-                    this.l('SMTPSETTINGS'),
+                    this.l('smtpsettings'),
                     '/app/smtpSettings',
                     'fas fa-cog',                    
                 ),

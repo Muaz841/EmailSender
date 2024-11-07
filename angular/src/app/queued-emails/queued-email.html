@@ -3,7 +3,7 @@
     <div class="container-fluid">
       <div class="row">
         <div class="col-6">
-          <h1>{{ "Queued Emails" | localize }}</h1>
+          <h1>{{ "Queued" | localize }}</h1>
         </div>
       </div>
     </div>
@@ -51,17 +51,38 @@
               <td>{{ email.to }}</td>
               <td>{{ email.subject }}</td>
               <td>
+                <!-- Check if email status is 'Pending' -->
+                <ng-container *ngIf="email.status === 'Pending'; else otherStatuses">
+                  <p-tag [value]="email.status" severity="info"> <i class="fa fa-circle-info mx-1"></i></p-tag>                 
+                </ng-container>              
+                <!-- Check if email status is 'Failed' -->
+                <ng-template #otherStatuses>
+                  <ng-container *ngIf="email.status === 'Failed'; else sentStatus">
+                    <p-tag [value]="email.status" severity="danger"><i class="fa fa-xmark text-danger mx-1"></i></p-tag>
+                    <button type="button" class="btn btn-sm bg-warning mx-1" style="height: 1.7rem;" (click)="updateFailed(email.id)">
+                      <i class="fa-solid fa-arrow-rotate-right"></i>
+                    </button>                    
+                  </ng-container>              
+                  <!-- Default to 'Sent' if status is not 'Pending' or 'Failed' -->
+                  <ng-template #sentStatus>
+                    <p-tag [value]="email.status" severity="success"><i class="fa fa-check text-success mx-1"></i></p-tag>                    
+                  </ng-template>
+                </ng-template>
+              </td>
+
+              <!-- <td>
                
                 <ng-container *ngIf="email.status === 'Failed'; else showTag">
-                  <button type="button" class="btn btn-sm bg-warning" (click)="updateFailed(email.id)">
-                    {{ "Retry" | localize }}
+                  <p-tag [value]="email.status" [severity]="'danger'"></p-tag>
+                  <button type="button" class="btn btn-sm bg-warning mx-1" style="height: 1.7rem;" (click)="updateFailed(email.id)">
+                    <i class="fa-solid fa-arrow-rotate-right"></i>
                   </button>
                 </ng-container>                
             
                 <ng-template #showTag>
                   <p-tag [value]="email.status" [severity]="email.status == 'sent' ? 'success' : 'danger'"></p-tag>
                 </ng-template>
-              </td>
+              </td> -->
 
             </tr>
           </ng-template>

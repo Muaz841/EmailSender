@@ -27,15 +27,15 @@ namespace EmailSender.EntityFrameworkCore.Seed.Host
             }
 
             // Emailing +     //smtp
-            AddSettingIfNotExists(EmailSettingNames.DefaultFromAddress, "", tenantId);
-            AddSettingIfNotExists(EmailSettingNames.DefaultFromDisplayName, "", tenantId);        
-            AddSettingIfNotExists(EmailSettingNames.Smtp.Host, "", tenantId);
-            AddSettingIfNotExists(EmailSettingNames.Smtp.Port, "", tenantId);
-            AddSettingIfNotExists(EmailSettingNames.Smtp.UserName, "", tenantId);
-            AddSettingIfNotExists(EmailSettingNames.Smtp.Password, "", tenantId);
-            AddSettingIfNotExists(EmailSettingNames.Smtp.EnableSsl, "", tenantId);
-            AddSettingIfNotExists(EmailSettingNames.Smtp.Domain, "", tenantId);
-            AddSettingIfNotExists(EmailSettingNames.Smtp.UseDefaultCredentials, "", tenantId);
+            AddSettingIfNotExists(EmailSettingNames.DefaultFromAddress, " ", tenantId);
+            AddSettingIfNotExists(EmailSettingNames.DefaultFromDisplayName, " ", tenantId);        
+            AddSettingIfNotExists(EmailSettingNames.Smtp.Host, " ", tenantId);
+            AddSettingIfNotExists(EmailSettingNames.Smtp.Port, " ", tenantId);
+            AddSettingIfNotExists(EmailSettingNames.Smtp.UserName, " ", tenantId);
+            AddSettingIfNotExists(EmailSettingNames.Smtp.Password, " ", tenantId);
+            AddSettingIfNotExists(EmailSettingNames.Smtp.EnableSsl," " , tenantId);
+            AddSettingIfNotExists(EmailSettingNames.Smtp.Domain, " false", tenantId);
+            AddSettingIfNotExists(EmailSettingNames.Smtp.UseDefaultCredentials, " ", tenantId);
             // Languages
             AddSettingIfNotExists(LocalizationSettingNames.DefaultLanguage, "en", tenantId);
 

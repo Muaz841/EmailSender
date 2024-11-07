@@ -124,5 +124,6 @@
 		<text name="Template">Email Templates</text>
 		<text name="Queued">Emails In Queue</text>
 		<text name="QueueDetails">Queued Email Details</text>
+		<text name="smtpsettings">SMTP SETTINGS</text>
 	</texts>
 </localizationDictionary>

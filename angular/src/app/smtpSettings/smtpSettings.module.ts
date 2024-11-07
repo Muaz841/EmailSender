@@ -15,12 +15,20 @@ import { SmtpSettingsServiceServiceProxy } from '@shared/service-proxies/service
 import {SmtpSettingsRoutingModule} from './smtpSettings.routingmodule';
 import { DialogModule } from 'primeng/dialog';
 import { ChipsModule } from 'primeng/chips';
+import { InputTextModule } from 'primeng/inputtext';
+import { CheckboxModule } from 'primeng/checkbox';
+import { InputGroupModule } from 'primeng/inputgroup';
+import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
+import { RippleModule } from 'primeng/ripple';
+import { MessageService } from 'abp-ng2-module';
 
 
 @NgModule({
     declarations: [SmtpSettingsComponent],
-    imports: [ChipsModule, DialogModule,FormsModule,DropdownModule,TableModule,AccordionModule,CommonModule,ButtonModule,SmtpSettingsRoutingModule,
+    imports: [RippleModule,InputGroupAddonModule,
+        InputGroupModule,CheckboxModule,InputTextModule,ChipsModule, DialogModule,
+        FormsModule,DropdownModule,TableModule,AccordionModule,CommonModule,ButtonModule,SmtpSettingsRoutingModule,
         EditorModule,SharedModule,FieldsetModule,TabViewModule,FloatLabelModule],
-        providers: [SmtpSettingsServiceServiceProxy]
+        providers: [SmtpSettingsServiceServiceProxy,MessageService]
 })
 export class SmtpSettingmodule {}

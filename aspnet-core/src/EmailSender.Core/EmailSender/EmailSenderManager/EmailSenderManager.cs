@@ -12,6 +12,9 @@ using System.Net.Mail;
 using System.Net;
 using System.Threading.Tasks;
 using static EmailSender.EmailSender.EmailSenderManager.SmtpDto.SmtpSettingsMethod;
+using EmailSender.MultiTenancy;
+using EmailSender.Authorization.Users;
+using Abp.UI;
 
 
 namespace EmailSender.EmailSender.EmailSender
@@ -20,21 +23,23 @@ namespace EmailSender.EmailSender.EmailSender
     {
         private readonly IEmailTemplateManager _templateManager;
         private readonly IQueuedEmailManager _queuedEmailManager;
-        private readonly IAbpSession _abpSession;
-        
+       private readonly IAbpSession _abpSession;        
+        private readonly TenantManager _tenatmanager;
         private readonly ISettingManager _settingManager;
-        public EmailSenderManager(ISettingManager settingManager, IEmailTemplateManager templateManager, IQueuedEmailManager queuedEmailManager, IConfiguration configuration, IAbpSession abpSession)
+        public EmailSenderManager(ISettingManager settingManager, IEmailTemplateManager templateManager, IQueuedEmailManager queuedEmailManager, IConfiguration configuration, IAbpSession abpSession, TenantManager tenatmanager)
         {
             this._templateManager = templateManager;
             this._queuedEmailManager = queuedEmailManager;
             this._settingManager = settingManager;
             _abpSession = abpSession;
+            _tenatmanager = tenatmanager;
         }
 
         public async Task<bool> SendEmailAsync(string username, string useremail, int tenantId)
         {
 
             var emailtemplate = await _templateManager.GetTemplateByIdAsync(tenantId);
+           var tenantname =  _tenatmanager.FindById(tenantId).TenancyName;
 
             var tokenReplacements = new Dictionary<string, string>
         {
@@ -48,12 +53,15 @@ namespace EmailSender.EmailSender.EmailSender
             var emailQueue = new QueuedEmailDto
             {
                 To = useremail,
+                EmailPriority = "High",
                 ToName = username,
                 Subject = emailtemplate.Subject,
                 Body = emailtemplate.Content,
                 TenantId = tenantId,
                 Status = "pending",
-                From = await _settingManager.GetSettingValueForTenantAsync(EmailSettingNames.DefaultFromAddress, tenantId),
+                From = tenantname,
+
+
                 FromName = await _settingManager.GetSettingValueForTenantAsync(EmailSettingNames.DefaultFromDisplayName, tenantId),
             };
             // Add the email to the queue
@@ -76,7 +84,8 @@ namespace EmailSender.EmailSender.EmailSender
 
         public async Task<bool> TestMail(string To)
             {
-                int TenantId = _abpSession.TenantId.Value;
+
+           int TenantId = _abpSession.TenantId.Value;
             var smtpSettings = await SmtpSettingsHelper.GetSmtpSettingsAsync(_settingManager, TenantId);
 
             using (var client = new SmtpClient(smtpSettings.Host, Int32.Parse(smtpSettings.Port))
@@ -90,9 +99,14 @@ namespace EmailSender.EmailSender.EmailSender
                 {
                     From = new MailAddress(smtpSettings.SenderEmail),
                     Subject = "Testingmail",
-                    Body  = "This is A testing mail",
+                    Body  = "testing!!!",
                     IsBodyHtml = true
                 };
+
+                if(string.Equals(smtpSettings.SenderEmail, To))
+                {                    
+                        throw new UserFriendlyException("CAN'T SEND TO SENDER");                    
+                }
                 mailMessage.To.Add(To);
 
                 // Send the email

@@ -1,6 +1,5 @@
 ﻿using Abp.Dependency;
 using Abp.Threading.BackgroundWorkers;
-using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using EmailSender.EmailSender.QueueEmail;
@@ -9,106 +8,103 @@ using System.Net;
 using Abp.Threading.Timers;
 using Abp.Domain.Uow;
 using Abp.Configuration;
-using Abp.Net.Mail;
 using EmailSender.MultiTenancy;
 using Abp.Domain.Repositories;
-using static EmailSender.Authorization.Roles.StaticRoleNames;
 using static EmailSender.EmailSender.EmailSenderManager.SmtpDto.SmtpSettingsMethod;
-using Castle.Facilities.TypedFactory.Internal;
-
+using System;
 
 namespace EmailSender.EmailSender.EmailWorker
 {
     public class EmailSendingWorker : PeriodicBackgroundWorkerBase, ISingletonDependency
     {
-        
         private readonly IQueuedEmailManager _emailQueueRepository;
-        private readonly IEmailSenderManager _emailSenderManager;
-        private readonly ILogger<EmailSendingWorker> logger;
+        private readonly ILogger<EmailSendingWorker> _logger;
         private readonly IUnitOfWorkManager _unitOfWorkManager;
         private readonly ISettingManager _settingManager;
         private readonly IRepository<Tenant, int> _tenantRepository;
 
         public EmailSendingWorker(
-
             IUnitOfWorkManager unitOfWorkManager,
-              AbpTimer timer,
-                 IQueuedEmailManager emailQueueRepository,
-                 IEmailSenderManager emailSenderManager,
-                 IConfiguration configuration,
-                 ISettingManager settingManager,
-                 ILogger<EmailSendingWorker> logger,
-                  IRepository<Tenant, int> tenantRepository) : base(timer)
+            AbpTimer timer,
+            IQueuedEmailManager emailQueueRepository,
+            IEmailSenderManager emailSenderManager,
+            IConfiguration configuration,
+            ISettingManager settingManager,
+            ILogger<EmailSendingWorker> logger,
+            IRepository<Tenant, int> tenantRepository) : base(timer)
         {
-
             _settingManager = settingManager;
-            _emailQueueRepository = emailQueueRepository;           
-            _emailSenderManager = emailSenderManager;
-            logger = this.logger;
+            _emailQueueRepository = emailQueueRepository;
+            _logger = logger;
             Timer.Period = (10 * 1000);
             _unitOfWorkManager = unitOfWorkManager;
             _tenantRepository = tenantRepository;
         }
-        protected override async void DoWork()  
+
+        protected override async void DoWork()
+        
         {
             using (var unitOfWork = _unitOfWorkManager.Begin())
             {
-                var allTenant = await _tenantRepository.GetAllAsync();
-                foreach (var tenant in allTenant)
+                try  
                 {
-                    int TenantId = tenant.Id;
-                    //Fetching-SMTP SETTINGS
-                    var smtpSettings = await SmtpSettingsHelper.GetSmtpSettingsAsync(_settingManager, TenantId);
-                   
-                    var emails = await _emailQueueRepository.GetPendingEmailsTWAsync(TenantId);
+                    var allTenant = await _tenantRepository.GetAllListAsync();
 
-                    if (emails == null) { continue; }
-
-                    foreach (var email in emails)
+                    foreach (var tenant in allTenant)
                     {
-                        try
-                        {
-                            if (smtpSettings == null ||
-                             string.IsNullOrEmpty(smtpSettings.Host) ||
-                              string.IsNullOrEmpty(smtpSettings.Port.ToString()) ||
-                             string.IsNullOrEmpty(smtpSettings.UserName) ||
-                             string.IsNullOrEmpty(smtpSettings.Password))
-                            {
-                                await _emailQueueRepository.IncrementRetryCountAsync(email.Id);
-                                continue; // Skip this email and retry later
-                            }
+                        int tenantId = tenant.Id;
+                        var smtpSettings = await SmtpSettingsHelper.GetSmtpSettingsAsync(_settingManager, tenantId);
+                        var emails = await _emailQueueRepository.GetPendingEmailsTWAsync(tenantId);
 
-                            using (var client = new SmtpClient(smtpSettings.Host, Int32.Parse(smtpSettings.Port))
+                      
+
+                        foreach (var email in emails)
+                        {
+                            try
                             {
-                                Credentials = new NetworkCredential(smtpSettings.UserName, smtpSettings.Password),
-                                EnableSsl = smtpSettings.EnableSsl
-                            })
-                            {
-                                // Prepare the MailMessage
-                                var mailMessage = new MailMessage
+                                if (smtpSettings == null ||
+                                    string.IsNullOrEmpty(smtpSettings.Host) ||
+                                    string.IsNullOrEmpty(smtpSettings.Port.ToString()) ||
+                                    string.IsNullOrEmpty(smtpSettings.UserName) ||
+                                    string.IsNullOrEmpty(smtpSettings.Password))
                                 {
-                                    From = new MailAddress(smtpSettings.SenderEmail),
-                                    Subject = email.Subject,
-                                    Body = email.Body,
-                                    IsBodyHtml = true
-                                };
-                                mailMessage.To.Add(email.To);
+                                    await _emailQueueRepository.IncrementRetryCountAsync(email.Id);
+                                    continue;
+                                }
 
-                                // Send the email
-                                await client.SendMailAsync(mailMessage);
-                                await _emailQueueRepository.UpdateEmailStatusAsync(email.Id, "sent");
+                                using (var client = new SmtpClient(smtpSettings.Host, Int32.Parse(smtpSettings.Port))
+                                {
+                                    Credentials = new NetworkCredential(smtpSettings.UserName, smtpSettings.Password),
+                                    EnableSsl = smtpSettings.EnableSsl
+                                })
+                                {
+                                    var mailMessage = new MailMessage
+                                    {
+                                        From = new MailAddress(smtpSettings.SenderEmail),
+                                        Subject = email.Subject,
+                                        Body = email.Body,
+                                        IsBodyHtml = true
+                                    };
+                                    mailMessage.To.Add(email.To);
+
+                                    // Send the email
+                                    await client.SendMailAsync(mailMessage);
+                                    await _emailQueueRepository.UpdateEmailStatusAsync(email.Id, "sent");
+                                }
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            await unitOfWork.CompleteAsync();
-                            _emailQueueRepository.IncrementRetryCountAsync(email.Id);
+                            catch (Exception ex)
+                            {
+                                _logger.LogError(ex, $"Error sending email ID {email.Id}. Incrementing retry count.");
+                                await _emailQueueRepository.IncrementRetryCountAsync(email.Id);
+                            }
                         }
                     }
-
+                }
+                finally  // Finally block for completing the unit of work
+                {
+                    await unitOfWork.CompleteAsync();
                 }
             }
-
         }
     }
 }

@@ -63,7 +63,8 @@ namespace EmailSender.EntityFrameworkCore.Seed.Email
                         "  <div class=\"col-md-3\" style=\"display:flex; flex-direction:column; justify-content:center ;\">     " +
                         "      \r\n          <label>Email</label> \r\n          <input  type=\"email\" value=\"{{useremail}}\" style=\"padding: 5px;\" disabled>\r\n    " +
                         "    </div>\r\n       \r\n      </div>\r\n  \r\n      <!-- Replace with the direct image URL for the footer image -->\r\n  " +
-                        "    <img src=\"https://i.postimg.cc/vmCZWCfN/foot.png\" alt=\"foot\" width=\"100%\" height=\"50%\">\r\n  \r\n  </body>\r\n  </html>\r\n  \r\n\r\n",
+                        "     <p style=\"display:flex; justify-content:center; margin-top: 20px;\">\r\n        <a href=\"http://localhost:4200/account/login\" class=\"globe-button\" style=\"text-decoration: none; color: #007bff; font-weight: bold; display: flex; align-items: center;\">\r\n            <i class=\"fa-solid fa-globe\" style=\"margin-right: 5px;\"></i> Login\r\n        </a>\r\n    </p>" +
+                        "<img src=\"https://i.postimg.cc/FzNC97cv/foot.png\" alt=\"foot\" width=\"100%\" height=\"50%\">\r\n  \r\n  </body>\r\n  </html>\r\n  \r\n\r\n",
                         Bcc = "bcc@example.com",
                         IsActive = true,
                         Token = "{{username}}, {{useremail}}",

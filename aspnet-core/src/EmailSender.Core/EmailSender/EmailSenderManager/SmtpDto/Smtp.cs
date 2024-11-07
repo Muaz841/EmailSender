@@ -35,7 +35,9 @@ namespace EmailSender.EmailSender.EmailSenderManager.SmtpDto
                     UserName = await settingManager.GetSettingValueForTenantAsync(EmailSettingNames.Smtp.UserName, tenantId),
                     Password = await settingManager.GetSettingValueForTenantAsync(EmailSettingNames.Smtp.Password, tenantId),
                     SenderEmail = await settingManager.GetSettingValueForTenantAsync(EmailSettingNames.DefaultFromAddress, tenantId),
-                    EnableSsl = await settingManager.GetSettingValueForTenantAsync<bool>(EmailSettingNames.Smtp.EnableSsl, tenantId)
+                   EnableSsl = bool.TryParse(await settingManager.GetSettingValueForTenantAsync(EmailSettingNames.Smtp.EnableSsl, tenantId), out var enableSsl) && enableSsl
+
+
                 };
             }
         }

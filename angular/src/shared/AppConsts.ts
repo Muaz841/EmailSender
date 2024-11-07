@@ -13,7 +13,7 @@ export class AppConsts {
     };
 
     static readonly localization = {
-        defaultLocalizationSourceName: 'MAINABP'
+        defaultLocalizationSourceName: 'EmailSender'
     };
 
     static readonly authorization = {

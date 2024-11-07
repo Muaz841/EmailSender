@@ -13,7 +13,6 @@ class queuedEmailRequestDto extends PagedRequestDto {
 @Component({
   animations: [appModuleAnimation()],
   templateUrl: './queued-email.html',
-
 })
 
 
@@ -52,7 +51,9 @@ protected list(request: queuedEmailRequestDto, pageNumber: number, finishedCallb
       });          
 }
 
-
+ refresh(): void {
+  this.refresh();
+ }
 protected delete(entity: QueuedEmailDto): void {
   throw new Error('Method not implemented.');
 }
@@ -65,6 +66,7 @@ protected updateFailed(id)
     response => {});
     abp.notify.success(('status updated'));
     this.refresh();
+    
 }
 
 

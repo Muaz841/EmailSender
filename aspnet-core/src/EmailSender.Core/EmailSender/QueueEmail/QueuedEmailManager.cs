@@ -27,7 +27,7 @@ namespace EmailSender.EmailSender.QueueEmail
 
         public async Task<List<QueuedEmailDto>> GetPendingEmailsAsync()
         {
-            var queued = await _queuedRepository.GetAllListAsync(q => q.Status != "Sent" && q.RetryCount < 5);
+            var queued = await _queuedRepository.GetAllListAsync(q => q.Status != "Sent" && q.RetryCount < 6);
             return _objectMapper.Map<List<QueuedEmailDto>>(queued);
         }
 
@@ -35,11 +35,11 @@ namespace EmailSender.EmailSender.QueueEmail
         {
             var email = await _queuedRepository.GetAsync(emailId);
             email.RetryCount++;
-            if(email.RetryCount >= 5)
+            if (email.RetryCount > 4)
             {
                 email.Status = "Failed";
             }
-
+                       
             using (var unitOfWork = _unitOfWorkManager.Begin(System.Transactions.TransactionScopeOption.RequiresNew))
             {
                 await _queuedRepository.UpdateAsync(email);
@@ -100,7 +100,7 @@ namespace EmailSender.EmailSender.QueueEmail
         public async Task<List<QueuedEmailDto>> GetPendingEmailsTWAsync(int tenantid)
         {
             using (var unitOfWork = _unitOfWorkManager.Current.SetTenantId(tenantid)) {
-                var queued = await _queuedRepository.GetAllListAsync(q => q.Status != "Sent" && q.RetryCount < 5);
+                var queued = await _queuedRepository.GetAllListAsync(q => q.Status != "Sent" && q.RetryCount < 6);
                 return _objectMapper.Map<List<QueuedEmailDto>>(queued);
             }
             
