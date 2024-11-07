@@ -23,6 +23,7 @@ import { RippleModule } from 'primeng/ripple';
 import { MessageService } from 'abp-ng2-module';
 
 
+
 @NgModule({
     declarations: [SmtpSettingsComponent],
     imports: [RippleModule,InputGroupAddonModule,

@@ -3,6 +3,7 @@ using Abp.MultiTenancy;
 using Abp.Net.Mail;
 using Abp.Runtime.Session;
 using Abp.UI;
+using Castle.Facilities.TypedFactory.Internal;
 using EmailSender.EmailSender;
 using EmailSender.EmailSender.EmailSenderManager.SmtpDto;
 using EmailSender.EmailServices.QueueEmail;
@@ -35,7 +36,7 @@ namespace EmailSender.EmailServices.EmailSettings
             var Id = _abpSession.TenantId.Value;
 
             var settings = new SmtpSettingsDto
-            {   
+            {
                 Host = await _settingManager.GetSettingValueForTenantAsync(EmailSettingNames.Smtp.Host, Id),
                 Port = await _settingManager.GetSettingValueForTenantAsync(EmailSettingNames.Smtp.Port, Id),
                 UserName = await _settingManager.GetSettingValueForTenantAsync(EmailSettingNames.Smtp.UserName, Id),
@@ -44,6 +45,15 @@ namespace EmailSender.EmailServices.EmailSettings
                 EnableSsl = await _settingManager.GetSettingValueForTenantAsync<bool>(EmailSettingNames.Smtp.EnableSsl, Id),
                 SenderEmail = await _settingManager.GetSettingValueForTenantAsync(EmailSettingNames.DefaultFromAddress, Id),
             };
+
+            if (
+                String.IsNullOrWhiteSpace(settings.Host) ||
+                String.IsNullOrWhiteSpace(settings.Port) ||
+                String.IsNullOrWhiteSpace(settings.Password) ||
+                String.IsNullOrWhiteSpace(settings.UserName) )               
+                {
+                throw new UserFriendlyException("Some SMTP settings are missing or empty.");
+                 }
             return settings;
         }
 
