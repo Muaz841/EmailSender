@@ -61,7 +61,7 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
                 'fas fa-users',
                 'Pages.Users'
             ),
-            new MenuItem(this.l('Email'), '', 'fas fa-message', '', [
+            new MenuItem(this.l('Email'), '', 'fas fa-envelope-open-text', '', [
                 new MenuItem(
                     this.l('Template'),
                     '/app/email-Template/email-Template',
@@ -71,14 +71,14 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
                 new MenuItem(
                     this.l('Template'),
                     '/app/email-Template/host-Template',
-                    'fas fa-message',
+                    'fas fa-envelope-open',
                     'Pages.Tenants',
                     
                 ),
                 new MenuItem(
                     this.l('Queued'),
                     '/app/queued-email',
-                    'fas fa-message',                    
+                    'fas fa-envelopes-bulk',                    
                 ),
                 new MenuItem(
                     this.l('smtpsettings'),
